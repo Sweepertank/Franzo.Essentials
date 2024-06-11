@@ -1,0 +1,10 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Franzo.Essentials.NetStandard\Franzo.Essentials.NetStandard.csproj" />
+  </ItemGroup>
+
+</Project>

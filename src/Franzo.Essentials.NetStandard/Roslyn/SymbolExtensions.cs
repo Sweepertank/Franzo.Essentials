@@ -1,0 +1,102 @@
+using System.Text.RegularExpressions;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+
+namespace Franzo.Essentials.Roslyn;
+
+public static class SymbolExtensions
+{
+    public static bool CorrectEquals(this ISymbol? self, ISymbol? other)
+    {
+        return SymbolEqualityComparer.Default.Equals(self, other);
+    }
+
+    public static IEnumerable<INamedTypeSymbol> ContainingTypes(this ISymbol self)
+    {
+        var type = self.ContainingType;
+        while (type is not null)
+        {
+            yield return type;
+            type = type.ContainingType;
+        }
+    }
+
+    public static IEnumerable<ISymbol> SelfAndContainingTypes(this ISymbol self)
+    {
+        yield return self;
+        foreach (var type in self.ContainingTypes())
+        {
+            yield return type;
+        }
+    }
+
+    public static bool AreSelfAndContainingTypesPartiallyDeclared(this ISymbol self)
+    {
+        return self.SelfAndContainingTypes().All(s => s.IsPartiallyDeclared());
+    }
+
+    public static bool IsPartiallyDeclared(this ISymbol symbol)
+    {
+        foreach (var reference in symbol.DeclaringSyntaxReferences)
+        {
+            if (reference.GetSyntax() is not MemberDeclarationSyntax memberDeclaration)
+            {
+                return false;
+            }
+            else if (!memberDeclaration.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword)))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public static string ToFullyQualifiedDisplayString(this ISymbol self)
+    {
+        return self.ToDisplayString(format: SymbolDisplayFormat.FullyQualifiedFormat);
+    }
+
+    public static void WriteVerbatimizedName(this ISymbol self, TextWriter writer)
+    {
+        writer.Write("@");
+        writer.Write(self.Name);
+    }
+
+    // @todo: this should return T eventually
+    public static IEnumerable<AttributeData> GetAttributes<T>(this ISymbol self) where T : Attribute
+    {
+        return self.GetAttributes().Where(
+            a => a.AttributeClass?.ToDisplayString() == typeof(T).FullName);
+    }
+
+    public static IEnumerable<AttributeData> GetAttributes(this ISymbol self, Type attributeType)
+    {
+        return self.GetAttributes().Where(
+            a => a.AttributeClass?.ToDisplayString() == attributeType.FullName);
+    }
+
+    public static IEnumerable<AttributeData> GetGenericAttributes(
+        this ISymbol self,
+        Type attributeTypeGenericDefinition)
+    {
+        return self.GetAttributes().Where(
+            a => a.AttributeClass is not null
+                && Regex.IsMatch(
+                    a.AttributeClass.ToDisplayString(),
+                    $"^{attributeTypeGenericDefinition.FullUngenericizedName()}<.*>$"));
+    }
+
+    public static bool HasAttribute<T>(this ISymbol self) where T : Attribute
+    {
+        return self.GetAttributes<T>().Any();
+    }
+
+    public static bool HasGenericAttribute(
+        this ISymbol self,
+        Type attributeGenericTypeDefinition)
+    {
+        return self.GetGenericAttributes(attributeGenericTypeDefinition).Any();
+    }
+}

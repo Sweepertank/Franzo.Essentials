@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>12.0</LangVersion>
+    <IsRoslynComponent>true</IsRoslynComponent>
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <GetTargetPathDependsOn>$(GetTargetPathDependsOn);GetDependencyTargetPaths</GetTargetPathDependsOn>
+    <!--<NoWarn>1591;RS2008</NoWarn>-->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Franzo.Essentials.NetStandard\Franzo.Essentials.NetStandard.csproj" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.4.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="all" />
+  </ItemGroup>
+
+  <!-- https://github.com/dotnet/roslyn/discussions/47517 -->
+
+  <ItemGroup>
+    <None Include="$(OutputPath)\*.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+  </ItemGroup>
+
+  <Target Name="GetDependencyTargetPaths">
+    <ItemGroup>
+      <!-- our local project will not generate path variable so we need to find it from it's own build output-->
+      <!-- I used $(OutputPath) variable because the dependecy has the exact TFM and configuration as the generator 
+            you might need to add configuration manually -->
+      <TargetPathWithTargetPlatformMoniker Include="$(ProjectDir)\..\Franzo.Essentials.NetStandard\$(OutputPath)\*.dll" IncludeRuntimeDependency="false" />
+    </ItemGroup>
+  </Target>
+
+</Project>

@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Franzo.Essentials\Franzo.Essentials.csproj" />
+    <ProjectReference Include="..\..\..\src\Franzo.Essentials.InterfaceInheritance.Generator\Franzo.Essentials.InterfaceInheritance.Generator.csproj" OutputItemType="Analyzer" />
+  </ItemGroup>
+  
+</Project>
+  
