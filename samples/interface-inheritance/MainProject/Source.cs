@@ -22,7 +22,13 @@ public partial interface IEntity
         remove => throw new NotImplementedException();
     }
 
-    public void BloodyEllArry<T, U>(object s, [NotNull] int f) where T : class? where U : IIgnored, new()
+    protected internal event EventHandler Worky
+    {
+        add => throw new NotImplementedException();
+        remove => throw new NotImplementedException();
+    }
+
+    public void BloodyEllArry<T, U>(object? s, [NotNull] int f) where T : class? where U : IIgnored, new()
     {
 
     }
@@ -40,6 +46,12 @@ public partial interface IEntity
         /// </summary>
         [TypeConverter("heck")]
         public int Foo { get; set; }
+
+        private int Bark { get; set; }
+
+        public event EventHandler? GoopyFloop;
+
+        private event EventHandler? Bark2;
 
         public Data_(int foo)
         {
@@ -65,14 +77,35 @@ public partial interface IResource
 
 public partial interface IEntityResource : IEntity, IResource
 {
+    protected int ProtectedProperty
+    {
+        get => throw new NotImplementedException();
+        set => throw new NotImplementedException();
+    }
+
+    protected int this[string? s, char y]
+    {
+        get => throw new NotImplementedException();
+        set => throw new NotImplementedException();
+    }
+
     [InterfaceData]
     public new partial class Data_
     {
+        private int Gorbus { get; set; }
+        protected int Chorbus { get; }
+
+        protected event EventHandler<int>? Yorkifier;
+
         public Data_(int foo, int bar)
         {
-            //IEntityData = ConstructIEntity(foo);
-            //IResourceData = ConstructIResource(bar);
+            EntityData = ConstructEntity(foo);
+            ResourceData = ConstructResource(bar);
         }
+    }
+
+    protected void HeckleBeckle()
+    {
     }
 }
 
@@ -81,6 +114,6 @@ public partial class Greg
 {
     public Greg()
     {
-        //IEntityResourceData = ConstructIEntityResource(1, 2);
+        EntityResourceData = ConstructEntityResource(1, 2);
     }
 }

@@ -39,6 +39,11 @@ internal class InternalTypeSymbol : InternalSymbol, IInternalTypeSymbol
         get => DeclaredFeatures.OfType<InternalPropertySymbol>();
     }
 
+    public IEnumerable<InternalEventSymbol> DeclaredEvents
+    {
+        get => DeclaredFeatures.OfType<InternalEventSymbol>();
+    }
+
     public IEnumerable<InternalMethodSymbol> DeclaredMethods
     {
         get => DeclaredFeatures.OfType<InternalMethodSymbol>();

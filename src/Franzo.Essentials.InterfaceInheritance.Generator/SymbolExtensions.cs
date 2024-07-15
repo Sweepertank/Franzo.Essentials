@@ -94,13 +94,19 @@ internal static class SymbolExtensions
         return Compare(DuplicateSourceComparer, self, otherMember);
     }
 
-    public static bool IsAssignableTo(
-        this ITypeSymbol self,
-        ITypeSymbol other,
-        CSharpCompilation compilation)
+    public static bool IsProtectedOrProtectedAndOrInternal(this ISymbol self)
     {
-        var conversion = compilation.ClassifyConversion(self, other);
-        return conversion.IsImplicit && !conversion.IsUserDefined;
+        return self.DeclaredAccessibility
+            is Accessibility.Protected
+            or Accessibility.ProtectedAndInternal
+            or Accessibility.ProtectedOrInternal;
+    }
+
+    public static bool IsPublicOrInternal(this ISymbol self)
+    {
+        return self.DeclaredAccessibility
+            is Accessibility.Public
+            or Accessibility.Internal;
     }
 
     private static bool Compare(object comparer, ISymbol a, ISymbol b)

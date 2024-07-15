@@ -7,6 +7,10 @@ namespace Franzo.Essentials.Roslyn;
 
 public static class SymbolExtensions
 {
+    private static SymbolDisplayFormat FullyQualifiedWithNullableReferenceTypeAnnotationsFormat =
+        SymbolDisplayFormat.FullyQualifiedFormat.AddMiscellaneousOptions(
+            SymbolDisplayMiscellaneousOptions.IncludeNullableReferenceTypeModifier);
+
     public static bool CorrectEquals(this ISymbol? self, ISymbol? other)
     {
         return SymbolEqualityComparer.Default.Equals(self, other);
@@ -55,7 +59,7 @@ public static class SymbolExtensions
 
     public static string ToFullyQualifiedDisplayString(this ISymbol self)
     {
-        return self.ToDisplayString(format: SymbolDisplayFormat.FullyQualifiedFormat);
+        return self.ToDisplayString(FullyQualifiedWithNullableReferenceTypeAnnotationsFormat);
     }
 
     public static void WriteVerbatimizedName(this ISymbol self, TextWriter writer)
