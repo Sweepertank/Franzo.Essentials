@@ -21,7 +21,6 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             .Where(t => t is not null);
 
         // @todo: use context.SyntaxProvider.ForAttributeWithMetadataName
-        // @todo: correctly inherit protected interface members
 
         context.RegisterSourceOutput(
             context.CompilationProvider.Combine(types.Collect()),

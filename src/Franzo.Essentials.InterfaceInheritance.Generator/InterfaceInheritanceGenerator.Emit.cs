@@ -177,6 +177,11 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                             or MethodKind.PropertySet
                             or MethodKind.EventAdd
                             or MethodKind.EventRemove
+                    }
+                    || feature.RoslynSymbol is IFieldSymbol
+                    {
+                        IsConst: false,
+                        IsReadOnly: false
                     })
                 {
                     continue;
@@ -609,6 +614,10 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         {
             writer.Write(SyntaxFactory.Literal(str).ToString());
         }
+        else if (constant is bool b)
+        {
+            writer.Write(b ? "true" : "false");
+        }
         else
         {
             writer.Write(constant);
@@ -828,7 +837,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
             if (property.RoslynSymbol.IsProtectedOrProtectedAndOrInternal())
             {
-                EmitUnsafeGetterForProperty(property.RoslynSymbol, writer);
+                EmitUnsafeGetterForProperty(property.RoslynSymbol, declaringType, writer);
             }
 
             writer.Write("return ");
@@ -863,7 +872,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
             if (property.RoslynSymbol.IsProtectedOrProtectedAndOrInternal())
             {
-                EmitUnsafeSetterForProperty(property.RoslynSymbol, writer);
+                EmitUnsafeSetterForProperty(property.RoslynSymbol, declaringType, writer);
                 EmitUnsafeSetterInvocationForProperty(property.RoslynSymbol, writer, "this");
             }
             else
@@ -952,11 +961,33 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         writer.Write(" ");
         writer.Write(field.RoslynSymbol.Name);
         writer.Write(" = ");
-        EmitFeatureLocationExpression(field, declaringType, writer);
-        writer.Write(".");
-        writer.Write(field.RoslynSymbol.Name);
+
+        if (field.RoslynSymbol.IsProtectedOrProtectedAndOrInternal())
+        {
+            if (field.RoslynSymbol.IsConst)
+            {
+                EmitConstant(field.RoslynSymbol.ConstantValue, field.RoslynSymbol.Type, writer);
+            }
+            else
+            {
+                field.RoslynSymbol.WriteUnsafeAccessorName(writer);
+                writer.Write("(null!)");
+            }
+        }
+        else
+        {
+            EmitFeatureLocationExpression(field, declaringType, writer);
+            writer.Write(".");
+            writer.Write(field.RoslynSymbol.Name);
+        }
+
         writer.Write(";");
         writer.WriteLine();
+
+        if (field.RoslynSymbol.IsProtectedOrProtectedAndOrInternal())
+        {
+            EmitUnsafeAccessorForField(field.RoslynSymbol, declaringType, writer);
+        }
     }
 
     private static void EmitEventInheritanceCore(
@@ -984,7 +1015,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
             if (@event.RoslynSymbol.IsProtectedOrProtectedAndOrInternal())
             {
-                EmitUnsafeAddMethodForEvent(@event.RoslynSymbol, writer);
+                EmitUnsafeAddMethodForEvent(@event.RoslynSymbol, declaringType, writer);
                 EmitUnsafeAddMethodInvocationForEvent(@event.RoslynSymbol, writer, "this");
             }
             else
@@ -1011,7 +1042,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
             if (@event.RoslynSymbol.IsProtectedOrProtectedAndOrInternal())
             {
-                EmitUnsafeRemoveMethodForEvent(@event.RoslynSymbol, writer);
+                EmitUnsafeRemoveMethodForEvent(@event.RoslynSymbol, declaringType, writer);
                 EmitUnsafeRemoveMethodInvocationForEvent(@event.RoslynSymbol, writer, "this");
             }
             else
@@ -1038,16 +1069,102 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         IndentedTextWriter writer,
         Context context)
     {
-        writer.Write(method.RoslynSymbol.ReturnType.ToFullyQualifiedDisplayString());
-        writer.Write(" ");
-        writer.Write(method.RoslynSymbol.Name);
-        EmitTypeParameterList(method.RoslynSymbol.TypeParameters, writer);
-        EmitMethodParameterList(method.RoslynSymbol, withinType, writer, context);
+        EmitMethodCoreSignature(method.RoslynSymbol, declaringType, withinType, writer, context);
         writer.WriteLine();
 
-        foreach (var typeParameter in method.RoslynSymbol.TypeParameters)
+        writer.WriteBracedSectionStart();
+
+        if (method.RoslynSymbol.IsProtectedOrProtectedAndOrInternal())
+        {
+            EmitUnsafeAccessorForMethod(method.RoslynSymbol, declaringType, writer);
+        }
+
+        if (!method.RoslynSymbol.ReturnsVoid)
+        {
+            writer.Write("return ");
+        }
+
+        if (method.RoslynSymbol.IsProtectedOrProtectedAndOrInternal())
+        {
+            writer.Write(method.RoslynSymbol.Name);
+            //method.RoslynSymbol.WriteUnsafeAccessorName(writer);
+            EmitTypeParameterList(method.RoslynSymbol.TypeParameters, writer);
+            writer.Write("(");
+            if (method.RoslynSymbol.IsStatic)
+            {
+                writer.Write("null!");
+            }
+            else
+            {
+                writer.Write("this");
+            }
+
+            if (method.RoslynSymbol.Parameters.Length > 0)
+            {
+                writer.Write(", ");
+                EmitUnparenthesizedArgumentListFromParameters(method.RoslynSymbol.Parameters, writer);
+            }
+            writer.Write(")");
+        }
+        else
+        {
+            EmitFeatureLocationExpression(method, declaringType, writer);
+            writer.Write(".");
+            writer.Write(method.RoslynSymbol.Name);
+            EmitTypeParameterList(method.RoslynSymbol.TypeParameters, writer);
+            writer.Write("(");
+            EmitUnparenthesizedArgumentListFromParameters(method.RoslynSymbol.Parameters, writer);
+            writer.Write(")");
+        }
+
+        writer.Write(";");
+        writer.WriteLine();
+
+        writer.WriteBracedSectionEnd();
+    }
+
+    private static void EmitMethodCoreSignature(
+        IMethodSymbol method,
+        INamedTypeSymbol declaringType,
+        INamedTypeSymbol withinType,
+        IndentedTextWriter writer,
+        Context context,
+        bool isForUnsafeAccessor = false)
+    {
+        writer.Write(method.ReturnType.ToFullyQualifiedDisplayString());
+        writer.Write(" ");
+        /*if (isForUnsafeAccessor)
+        {
+            method.WriteUnsafeAccessorName(writer);
+        }
+        else
+        {*/
+        writer.Write(method.Name);
+        //}
+        EmitTypeParameterList(method.TypeParameters, writer);
+        writer.Write("(");
+        if (isForUnsafeAccessor)
+        {
+            writer.Write(declaringType.ToFullyQualifiedDisplayString());
+            writer.Write(" c");
+            if (method.Parameters.Length > 0)
+            {
+                writer.Write(", ");
+            }
+        }
+        EmitUnparenthesizedParameterList(
+            method.Parameters,
+            withinType,
+            writer,
+            context,
+            isForUnsafeAccessor);
+        writer.Write(")");
+
+        foreach (var typeParameter in method.TypeParameters)
         {
             if (!typeParameter.HasConstraints()) continue;
+
+            writer.WriteLine();
 
             // @todo: EnumerableExtensions.WithLastFlag
 
@@ -1058,35 +1175,17 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             writer.Write(" : ");
 
             var constraintStrings = EnumerateConstraintStrings(typeParameter).ToArray();
-            foreach ((var i, var constraintString) in constraintStrings.IndicesAndItems())
+            foreach ((var j, var constraintString) in constraintStrings.IndicesAndItems())
             {
                 writer.Write(constraintString);
-                if (i != constraintStrings.Length - 1)
+                if (j != constraintStrings.Length - 1)
                 {
                     writer.Write(", ");
                 }
             }
 
-            writer.WriteLine();
             writer.Indent--;
         }
-
-        writer.WriteBracedSectionStart();
-
-        if (!method.RoslynSymbol.ReturnsVoid)
-        {
-            writer.Write("return ");
-        }
-        EmitFeatureLocationExpression(method, declaringType, writer);
-        writer.Write(".");
-        writer.Write(method.RoslynSymbol.Name);
-        EmitTypeParameterList(method.RoslynSymbol.TypeParameters, writer);
-        writer.Write("(");
-        EmitUnparenthesizedArgumentListFromParameters(method.RoslynSymbol.Parameters, writer);
-        writer.Write(");");
-        writer.WriteLine();
-
-        writer.WriteBracedSectionEnd();
     }
 
     private static IEnumerable<string> EnumerateConstraintStrings(
@@ -1104,7 +1203,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             }
         }
 
-        if (typeParameter.HasValueTypeConstraint)
+        if (typeParameter.HasValueTypeConstraint && !typeParameter.HasUnmanagedTypeConstraint)
         {
             yield return "struct";
         }
@@ -1180,7 +1279,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
             if (!property.IsPublicOrInternal())
             {
-                EmitUnsafeGetterForProperty(property, writer);
+                EmitUnsafeGetterForProperty(property, property.ContainingType, writer);
             }
 
             writer.Write("return ");
@@ -1222,7 +1321,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             }
             else
             {
-                EmitUnsafeSetterForProperty(property, writer);
+                EmitUnsafeSetterForProperty(property, property.ContainingType, writer);
                 EmitUnsafeSetterInvocationForProperty(
                     property,
                     writer,
@@ -1274,7 +1373,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             }
             else
             {
-                EmitUnsafeAddMethodForEvent(@event, writer);
+                EmitUnsafeAddMethodForEvent(@event, @event.ContainingType, writer);
                 EmitUnsafeAddMethodInvocationForEvent(
                     @event,
                     writer,
@@ -1304,7 +1403,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             }
             else
             {
-                EmitUnsafeRemoveMethodForEvent(@event, writer);
+                EmitUnsafeRemoveMethodForEvent(@event, @event.ContainingType, writer);
                 EmitUnsafeRemoveMethodInvocationForEvent(
                     @event,
                     writer,
@@ -1322,6 +1421,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
     private static void EmitUnsafeGetterForProperty(
         IPropertySymbol property,
+        INamedTypeSymbol declaringType,
         IndentedTextWriter writer)
     {
         writer.Write("[global::System.Runtime.CompilerServices.UnsafeAccessorAttribute(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Method)]");
@@ -1331,7 +1431,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         writer.Write(" ");
         writer.Write(property.GetMethod!.Name);
         writer.Write("(");
-        writer.Write(property.ContainingType);
+        writer.Write(declaringType.ToFullyQualifiedDisplayString());
         writer.Write(" c");
         if (property.IsIndexer)
         {
@@ -1349,6 +1449,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
     private static void EmitUnsafeSetterForProperty(
         IPropertySymbol property,
+        INamedTypeSymbol declaringType,
         IndentedTextWriter writer)
     {
         writer.Write("[global::System.Runtime.CompilerServices.UnsafeAccessorAttribute(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Method)]");
@@ -1358,7 +1459,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         writer.Write(" ");
         writer.Write(property.SetMethod!.Name);
         writer.Write("(");
-        writer.Write(property.ContainingType);
+        writer.Write(declaringType.ToFullyQualifiedDisplayString());
         writer.Write(" c");
         if (property.IsIndexer)
         {
@@ -1433,6 +1534,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
     private static void EmitUnsafeAddMethodForEvent(
         IEventSymbol @event,
+        INamedTypeSymbol declaringType,
         IndentedTextWriter writer)
     {
         writer.Write("[global::System.Runtime.CompilerServices.UnsafeAccessorAttribute(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Method)]");
@@ -1440,7 +1542,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         writer.Write("extern static void ");
         writer.Write(@event.AddMethod!.Name);
         writer.Write("(");
-        writer.Write(@event.ContainingType.ToFullyQualifiedDisplayString());
+        writer.Write(declaringType.ToFullyQualifiedDisplayString());
         writer.Write(" c, ");
         writer.Write(@event.Type.ToFullyQualifiedDisplayString());
         writer.Write(" h);");
@@ -1449,6 +1551,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
     private static void EmitUnsafeRemoveMethodForEvent(
         IEventSymbol @event,
+        INamedTypeSymbol declaringType,
         IndentedTextWriter writer)
     {
         writer.Write("[global::System.Runtime.CompilerServices.UnsafeAccessorAttribute(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Method)]");
@@ -1456,7 +1559,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         writer.Write("extern static void ");
         writer.Write(@event.RemoveMethod!.Name);
         writer.Write("(");
-        writer.Write(@event.ContainingType.ToFullyQualifiedDisplayString());
+        writer.Write(declaringType.ToFullyQualifiedDisplayString());
         writer.Write(" c, ");
         writer.Write(@event.Type.ToFullyQualifiedDisplayString());
         writer.Write(" h);");
@@ -1499,5 +1602,43 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         }
 
         writer.Write(", value)");
+    }
+
+    private static void EmitUnsafeAccessorForField(
+        IFieldSymbol field,
+        INamedTypeSymbol declaringType,
+        IndentedTextWriter writer)
+    {
+        writer.Write("[global::System.Runtime.CompilerServices.UnsafeAccessorAttribute(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Field, Name=\"");
+        writer.Write(field.Name);
+        writer.Write("\")]");
+        writer.WriteLine();
+        writer.Write("private extern static ");
+        writer.Write(field.Type.ToFullyQualifiedDisplayString());
+        writer.Write(" ");
+        field.WriteUnsafeAccessorName(writer);
+        writer.Write("(");
+        writer.Write(declaringType.ToFullyQualifiedDisplayString());
+        writer.Write(" c);");
+        writer.WriteLine();
+    }
+
+    private static void EmitUnsafeAccessorForMethod(
+        IMethodSymbol method,
+        INamedTypeSymbol declaringType,
+        IndentedTextWriter writer)
+    {
+        writer.Write("[global::System.Runtime.CompilerServices.UnsafeAccessorAttribute(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Method)]");
+        writer.WriteLine();
+        writer.Write("extern static ");
+        EmitMethodCoreSignature(
+            method,
+            declaringType,
+            null!,
+            writer,
+            null!,
+            isForUnsafeAccessor: true);
+        writer.Write(";");
+        writer.WriteLine();
     }
 }

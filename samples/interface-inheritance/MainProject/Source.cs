@@ -16,6 +16,8 @@ public partial interface IEntity
 {
     public static readonly int Yeck = 5;
     public const bool Yeck2 = true;
+    protected static readonly bool Yeck3 = false;
+    protected const bool Yeck4 = false;
     public event EventHandler Corky
     {
         add => throw new NotImplementedException();
@@ -104,7 +106,15 @@ public partial interface IEntityResource : IEntity, IResource
         }
     }
 
-    protected void HeckleBeckle()
+    public void HeckleBeckleA()
+    {
+    }
+
+    protected void HeckleBeckleB()
+    {
+    }
+
+    protected void HeckleBeckleC<G>(int s, string b) where G : unmanaged
     {
     }
 }
