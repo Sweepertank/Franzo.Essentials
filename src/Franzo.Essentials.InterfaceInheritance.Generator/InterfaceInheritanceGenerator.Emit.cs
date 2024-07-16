@@ -595,7 +595,6 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         ITypeSymbol constantType,
         IndentedTextWriter writer)
     {
-        // @todo: explicitly disallow structs having InheritInterface
         if (constant is null)
         {
             EmitNull(writer);

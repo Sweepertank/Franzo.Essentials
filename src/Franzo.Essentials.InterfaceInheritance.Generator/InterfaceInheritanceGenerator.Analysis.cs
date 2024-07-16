@@ -182,7 +182,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                 invalid = true;
             }
 
-            if (!type.RoslynSymbol.TypeKind.IsClassOrStruct())
+            if (type.RoslynSymbol.TypeKind is not TypeKind.Class)
             {
                 context.ReportDiagnostic(
                     Diagnostic.Create(DiagnosticDescriptors.Dummy, attribute.Location()));
@@ -259,7 +259,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                 roslynInterface = (INamedTypeSymbol)boundType;
             }
 
-            if (!type.RoslynSymbol.TypeKind.IsClassOrStruct())
+            if (type.RoslynSymbol.TypeKind is not TypeKind.Class)
             {
                 context.ReportDiagnostic(
                     Diagnostic.Create(DiagnosticDescriptors.Dummy, attribute.Location()));
