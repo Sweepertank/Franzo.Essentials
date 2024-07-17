@@ -91,11 +91,45 @@ public partial interface IEntityResource : IEntity, IResource
         set => throw new NotImplementedException();
     }
 
+    public sealed void TestProxies()
+    {
+        Gorbus = 5;
+        Console.WriteLine(Gorbus);
+        Chorbus = 6;
+        Console.WriteLine(Chorbus);
+    }
+
+    protected sealed void TestInheritances1()
+    {
+        Console.WriteLine("TestInheritances1");
+    }
+
+    protected static readonly string TestInheritances2 = "TestInheritances2";
+
+    protected sealed string TestInheritances3
+    {
+        get
+        {
+            Console.WriteLine("TestInheritances3 - get");
+            return "";
+        }
+        set
+        {
+            Console.WriteLine("TestInheritances3 - set");
+        }
+    }
+
+    protected sealed event EventHandler TestInheritances4
+    {
+        add => Console.WriteLine("TestInheritances4 - add");
+        remove => Console.WriteLine("TestInheritances4 - remove");
+    }
+
     [InterfaceData]
     public new partial class Data_
     {
         private int Gorbus { get; set; }
-        protected int Chorbus { get; }
+        protected int Chorbus { get; set; }
 
         protected event EventHandler<int>? Yorkifier;
 
@@ -122,8 +156,17 @@ public partial interface IEntityResource : IEntity, IResource
 [InheritInterface<IEntityResource>]
 public partial class Greg
 {
+    private int Goofus { get; set; }
+
     public Greg()
     {
         EntityResourceData = ConstructEntityResource(1, 2);
+
+        TestProxies();
+        TestInheritances1();
+        Console.WriteLine(TestInheritances2);
+        TestInheritances3 = TestInheritances3;
+        TestInheritances4 += null!;
+        TestInheritances4 -= null!;
     }
 }

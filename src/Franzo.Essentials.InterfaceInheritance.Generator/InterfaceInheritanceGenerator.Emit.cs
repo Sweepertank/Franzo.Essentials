@@ -1423,7 +1423,14 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         INamedTypeSymbol declaringType,
         IndentedTextWriter writer)
     {
-        writer.Write("[global::System.Runtime.CompilerServices.UnsafeAccessorAttribute(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Method)]");
+        writer.Write("[global::System.Runtime.CompilerServices.UnsafeAccessorAttribute(global::System.Runtime.CompilerServices.UnsafeAccessorKind.");
+        if (property.IsStatic)
+        {
+            writer.Write("Static");
+        }
+        writer.Write("Method, Name=\"");
+        writer.Write(property.GetMethod!.Name);
+        writer.Write("\")]");
         writer.WriteLine();
         writer.Write("extern static ");
         writer.Write(property.Type.ToFullyQualifiedDisplayString());
@@ -1451,11 +1458,16 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         INamedTypeSymbol declaringType,
         IndentedTextWriter writer)
     {
-        writer.Write("[global::System.Runtime.CompilerServices.UnsafeAccessorAttribute(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Method)]");
+        writer.Write("[global::System.Runtime.CompilerServices.UnsafeAccessorAttribute(global::System.Runtime.CompilerServices.UnsafeAccessorKind.");
+        if (property.IsStatic)
+        {
+            writer.Write("Static");
+        }
+        writer.Write("Method, Name=\"");
+        writer.Write(property.SetMethod!.Name);
+        writer.Write("\")]");
         writer.WriteLine();
-        writer.Write("extern static ");
-        writer.Write(property.Type.ToFullyQualifiedDisplayString());
-        writer.Write(" ");
+        writer.Write("extern static void ");
         writer.Write(property.SetMethod!.Name);
         writer.Write("(");
         writer.Write(declaringType.ToFullyQualifiedDisplayString());
@@ -1536,7 +1548,14 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         INamedTypeSymbol declaringType,
         IndentedTextWriter writer)
     {
-        writer.Write("[global::System.Runtime.CompilerServices.UnsafeAccessorAttribute(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Method)]");
+        writer.Write("[global::System.Runtime.CompilerServices.UnsafeAccessorAttribute(global::System.Runtime.CompilerServices.UnsafeAccessorKind.");
+        if (@event.IsStatic)
+        {
+            writer.Write("Static");
+        }
+        writer.Write("Method, Name=\"");
+        writer.Write(@event.AddMethod!.Name);
+        writer.Write("\")]");
         writer.WriteLine();
         writer.Write("extern static void ");
         writer.Write(@event.AddMethod!.Name);
@@ -1553,7 +1572,14 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         INamedTypeSymbol declaringType,
         IndentedTextWriter writer)
     {
-        writer.Write("[global::System.Runtime.CompilerServices.UnsafeAccessorAttribute(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Method)]");
+        writer.Write("[global::System.Runtime.CompilerServices.UnsafeAccessorAttribute(global::System.Runtime.CompilerServices.UnsafeAccessorKind.");
+        if (@event.IsStatic)
+        {
+            writer.Write("Static");
+        }
+        writer.Write("Method, Name=\"");
+        writer.Write(@event.RemoveMethod!.Name);
+        writer.Write("\")]");
         writer.WriteLine();
         writer.Write("extern static void ");
         writer.Write(@event.RemoveMethod!.Name);
@@ -1608,11 +1634,16 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         INamedTypeSymbol declaringType,
         IndentedTextWriter writer)
     {
-        writer.Write("[global::System.Runtime.CompilerServices.UnsafeAccessorAttribute(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Field, Name=\"");
+        writer.Write("[global::System.Runtime.CompilerServices.UnsafeAccessorAttribute(global::System.Runtime.CompilerServices.UnsafeAccessorKind.");
+        if (field.IsStatic)
+        {
+            writer.Write("Static");
+        }
+        writer.Write("Field, Name=\"");
         writer.Write(field.Name);
         writer.Write("\")]");
         writer.WriteLine();
-        writer.Write("private extern static ");
+        writer.Write("private extern static ref ");
         writer.Write(field.Type.ToFullyQualifiedDisplayString());
         writer.Write(" ");
         field.WriteUnsafeAccessorName(writer);
@@ -1627,7 +1658,14 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         INamedTypeSymbol declaringType,
         IndentedTextWriter writer)
     {
-        writer.Write("[global::System.Runtime.CompilerServices.UnsafeAccessorAttribute(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Method)]");
+        writer.Write("[global::System.Runtime.CompilerServices.UnsafeAccessorAttribute(global::System.Runtime.CompilerServices.UnsafeAccessorKind.");
+        if (method.IsStatic)
+        {
+            writer.Write("Static");
+        }
+        writer.Write("Method, Name=\"");
+        writer.Write(method.Name);
+        writer.Write("\")]");
         writer.WriteLine();
         writer.Write("extern static ");
         EmitMethodCoreSignature(

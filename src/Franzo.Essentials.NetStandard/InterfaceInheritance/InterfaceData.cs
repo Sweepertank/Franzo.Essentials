@@ -2,20 +2,21 @@ namespace Franzo.Essentials.InterfaceInheritance;
 
 public abstract class InterfaceData : NetStandardNotifyPropertyChangedImpl
 {
-    public bool __IsConstructed = false;
+    public bool __IsConstructed;
 
     internal InterfaceData()
     {
+        __IsConstructed = true;
     }
 }
 
 public abstract class InterfaceData<T> : InterfaceData where T : class
 {
-    public T __This = null!;
+    public T? __This;
 
     public T This
     {
-        get => __This;
+        get => __This!;
     }
 
     protected sealed override void OnPropertyChanged(string? propertyName)
