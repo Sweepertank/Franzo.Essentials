@@ -1,0 +1,16 @@
+<Project>
+
+  <UsingTask
+      TaskName="Franzo.Essentials.InterfaceInheritance.MSBuild.DevirtualizationTask"
+      TaskFactory="TaskHostFactory"
+      AssemblyFile="$(DevirtualizationTaskAssemblyPath)" />
+
+  <Target
+      Name="InterfaceInheritanceDevirtualization"
+      AfterTargets="AfterCompile"
+      Condition="Exists(@(IntermediateAssembly)) And ($(DesignTimeBuild) != true Or $(BuildingForLiveUnitTesting) == true)">
+    <!-- Inputs="@(IntermediateAssembly)" -->
+    <Franzo.Essentials.InterfaceInheritance.MSBuild.DevirtualizationTask AssemblyPath="@(IntermediateAssembly)" />
+  </Target>
+
+</Project>

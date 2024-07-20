@@ -21,6 +21,8 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         writer.WriteLine("#nullable disable warnings");
         writer.WriteLine("#nullable disable warnings");
         writer.WriteLine("#pragma warning disable CS0108");
+        writer.WriteLine("#pragma warning disable CS0618");
+        writer.WriteLine("#pragma warning disable CS8387");
         writer.WriteLine();
 
         foreach (var type in context.AnalysisData.RootTypesToEmit)
@@ -38,15 +40,21 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         IndentedTextWriter writer,
         Context context)
     {
-        writer.Write("namespace ");
-        writer.Write(type.RoslynSymbol.ContainingNamespace.ToDisplayString());
-        writer.WriteLine();
-        writer.WriteBracedSectionStart();
+        if (!type.RoslynSymbol.ContainingNamespace.IsGlobalNamespace)
+        {
+            writer.Write("namespace ");
+            writer.Write(type.RoslynSymbol.ContainingNamespace.ToDisplayString());
+            writer.WriteLine();
+            writer.WriteBracedSectionStart();
+        }
 
         EmitType(type, writer, context);
 
-        writer.WriteBracedSectionEnd();
-        writer.WriteLine();
+        if (!type.RoslynSymbol.ContainingNamespace.IsGlobalNamespace)
+        {
+            writer.WriteBracedSectionEnd();
+            writer.WriteLine();
+        }
     }
 
     private static void EmitTypes(
@@ -182,7 +190,14 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                     {
                         IsConst: false,
                         IsReadOnly: false
-                    })
+                    }
+                    // @todo: once partial properties are in,
+                    // we should change this so that we *do* emit inheritances for public abstract properties and methods,
+                    // but just mark them them as partial
+                    // (ideally we would do so for events too, but it doesn't look like partial events are coming any time soon)
+                    || (feature.RoslynSymbol.DeclaredAccessibility is Accessibility.Public
+                        && feature.RoslynSymbol.IsAbstract)
+                    || feature.RoslynSymbol.Name == type.RoslynSymbol.Name)
                 {
                     continue;
                 }
@@ -423,7 +438,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
     private static void EmitMainModifiers(
         ISymbol symbol,
         IndentedTextWriter writer,
-        bool includeSealed)
+        bool includeSealed = false)
     {
         EmitAccessibilityModifiers(symbol.DeclaredAccessibility, writer);
 
@@ -757,7 +772,19 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         Context context)
     {
         EmitAttributes(feature.RoslynSymbol, withinType, writer, context, true);
-        EmitMainModifiers(feature.RoslynSymbol, writer, false);
+        if (feature is not InternalFieldSymbol
+            && feature.RoslynSymbol.DeclaredAccessibility is Accessibility.Public
+            && feature.RoslynSymbol.IsVirtual
+            && !feature.RoslynSymbol.IsAbstract)
+        {
+            writer.Write("[");
+#pragma warning disable CS0618
+            writer.Write(typeof(InterfaceInheritanceDevirtualizeAttribute).GloballyQualifiedName());
+#pragma warning restore CS0618
+            writer.Write("]");
+            writer.WriteLine();
+        }
+        EmitMainModifiers(feature.RoslynSymbol, writer);
         if (feature.HasOverrideAttribute)
         {
             writer.Write(" override");
@@ -1259,7 +1286,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         EmitMainModifiers(
             property,
             writer,
-            !property.IsVirtual && property.DeclaredAccessibility is not Accessibility.Private);
+            includeSealed: !property.IsVirtual && property.DeclaredAccessibility is not Accessibility.Private);
         writer.Write(" ");
         writer.Write(property.Type.ToFullyQualifiedDisplayString());
         writer.Write(" ");
@@ -1346,7 +1373,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         EmitMainModifiers(
             @event,
             writer,
-            !@event.IsVirtual && @event.DeclaredAccessibility is not Accessibility.Private);
+            includeSealed: !@event.IsVirtual && @event.DeclaredAccessibility is not Accessibility.Private);
         writer.Write(" event ");
         writer.Write(@event.Type.ToFullyQualifiedDisplayString());
         writer.Write(" ");

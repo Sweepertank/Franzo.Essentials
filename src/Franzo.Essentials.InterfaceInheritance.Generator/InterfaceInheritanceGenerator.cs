@@ -27,6 +27,13 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             Execute!);
     }
 
+    private static void SuppressVirtualCallsPostfix(object __instance, ref bool __result)
+    {
+        //var syntax = _syntaxGetter.Invoke(__instance);
+        Console.WriteLine("HOY");
+        //Console.WriteLine(syntax.ToFullString());
+    }
+
     private static bool IsNodePossiblyRelevant(SyntaxNode node)
     {
         return node is TypeDeclarationSyntax;

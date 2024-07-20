@@ -1,0 +1,6 @@
+<Project>
+  <PropertyGroup>
+    <DevirtualizationTaskAssemblyPath Condition="$(MSBuildThisFileDirectory.EndsWith('Franzo.Essentials\'))">..\Franzo.Essentials.InterfaceInheritance.MSBuild\bin\$(Configuration)\netstandard2.0\Franzo.Essentials.InterfaceInheritance.MSBuild.dll</DevirtualizationTaskAssemblyPath>
+    <DevirtualizationTaskAssemblyPath Condition="!$(MSBuildThisFileDirectory.EndsWith('Franzo.Essentials\'))">$(MSBuildThisFileDirectory)\..\tasks\netstandard2.0\Franzo.Essentials.InterfaceInheritance.MSBuild.dll</DevirtualizationTaskAssemblyPath>
+  </PropertyGroup>
+</Project>

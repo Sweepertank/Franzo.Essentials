@@ -1,3 +1,4 @@
 using MainProject;
 
-var s = new Greg();
+var g = new Greg();
+Console.WriteLine("Hey!");

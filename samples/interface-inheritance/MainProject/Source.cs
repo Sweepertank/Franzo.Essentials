@@ -37,6 +37,7 @@ public partial interface IEntity
 
     public int BloodyEllArry()
     {
+        Console.WriteLine("Bloody Ell Arry, it Worked!");
         return 0;
     }
 
@@ -99,14 +100,14 @@ public partial interface IEntityResource : IEntity, IResource
         Console.WriteLine(Chorbus);
     }
 
-    protected sealed void TestInheritances1()
+    protected void TestInheritances1()
     {
         Console.WriteLine("TestInheritances1");
     }
 
     protected static readonly string TestInheritances2 = "TestInheritances2";
 
-    protected sealed string TestInheritances3
+    protected string TestInheritances3
     {
         get
         {
@@ -119,10 +120,36 @@ public partial interface IEntityResource : IEntity, IResource
         }
     }
 
-    protected sealed event EventHandler TestInheritances4
+    protected event EventHandler TestInheritances4
     {
         add => Console.WriteLine("TestInheritances4 - add");
         remove => Console.WriteLine("TestInheritances4 - remove");
+    }
+
+    public void TestInheritances5()
+    {
+        Console.WriteLine("TestInheritances5");
+    }
+
+    public static readonly string TestInheritances6 = "TestInheritances6";
+
+    public string TestInheritances7
+    {
+        get
+        {
+            Console.WriteLine("TestInheritances7 - get");
+            return "";
+        }
+        set
+        {
+            Console.WriteLine("TestInheritances7 - set");
+        }
+    }
+
+    public event EventHandler TestInheritances8
+    {
+        add => Console.WriteLine("TestInheritances8 - add");
+        remove => Console.WriteLine("TestInheritances8 - remove");
     }
 
     [InterfaceData]
@@ -163,10 +190,69 @@ public partial class Greg
         EntityResourceData = ConstructEntityResource(1, 2);
 
         TestProxies();
+
         TestInheritances1();
         Console.WriteLine(TestInheritances2);
         TestInheritances3 = TestInheritances3;
         TestInheritances4 += null!;
         TestInheritances4 -= null!;
+
+        TestInheritances5();
+        Console.WriteLine(TestInheritances6);
+        TestInheritances7 = TestInheritances7;
+        TestInheritances8 += null!;
+        TestInheritances8 -= null!;
+
+        BloodyEllArry();
     }
 }
+
+/*using Franzo.Essentials.InterfaceInheritance;
+
+public partial interface IBaseCoolo
+{
+    public void BloodyEllArry2()
+    {
+        Console.WriteLine("Bloody Ell Arry, it Worked2!");
+    }
+
+    [InterfaceData]
+    public partial class Data_
+    {
+        public Data_()
+        {
+        }
+    }
+}
+
+public partial interface ICoolo : IBaseCoolo
+{
+    public void BloodyEllArry()
+    {
+        Console.WriteLine("Bloody Ell Arry, it Worked!");
+    }
+
+    public void York();
+
+    [InterfaceData]
+    public new partial class Data_
+    {
+        public Data_()
+        {
+            BaseCooloData = ConstructBaseCoolo();
+        }
+    }
+}
+
+[InheritInterface<ICoolo>]
+public partial class Greg
+{
+    public Greg()
+    {
+        CooloData = ConstructCoolo();
+    }
+
+    public void York()
+    {
+    }
+}*/

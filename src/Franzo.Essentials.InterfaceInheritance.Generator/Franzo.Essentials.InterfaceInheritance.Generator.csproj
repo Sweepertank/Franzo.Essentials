@@ -17,12 +17,24 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.4.0" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.4.0" PrivateAssets="all" ExcludeAssets="Runtime" />
+    <!--<PackageReference Include="Newtonsoft.Json" Version="12.0.1" PrivateAssets="all" GeneratePathProperty="true" />-->
+    <!--<PackageReference Include="Lib.Harmony" Version="2.3.3" PrivateAssets="all" GeneratePathProperty="true" />-->
   </ItemGroup>
+
+  <!--<ItemGroup>
+    <Reference Include="Lib.Harmony">
+      <HintPath>..\..\deps\Harmony\0Harmony.dll</HintPath>
+    </Reference>
+  </ItemGroup>-->
 
   <!-- https://github.com/dotnet/roslyn/discussions/47517 -->
 
   <ItemGroup>
     <None Include="$(OutputPath)\*.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <!--<None Include="$(PkgNewtonsoft_Json)\lib\netstandard2.0\*.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />-->
+    <!--<None Include="$(PkgLib_Harmony)\lib\net48\*.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />-->
+    <!--<None Include="$(ProjectDir)\..\..\deps\Harmony\*.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />-->
   </ItemGroup>
 
   <Target Name="GetDependencyTargetPaths">
@@ -31,6 +43,9 @@
       <!-- I used $(OutputPath) variable because the dependecy has the exact TFM and configuration as the generator 
             you might need to add configuration manually -->
       <TargetPathWithTargetPlatformMoniker Include="$(ProjectDir)\..\Franzo.Essentials.NetStandard\$(OutputPath)\*.dll" IncludeRuntimeDependency="false" />
+      <!--<TargetPathWithTargetPlatformMoniker Include="$(PkgNewtonsoft_Json)\lib\netstandard2.0\*.dll" IncludeRuntimeDependency="false" />-->
+      <!--<TargetPathWithTargetPlatformMoniker Include="$(PkgLib_Harmony)\lib\net48\*.dll" IncludeRuntimeDependency="false" />-->
+      <!--<TargetPathWithTargetPlatformMoniker Include="$(ProjectDir)\..\..\deps\Harmony\*.dll" IncludeRuntimeDependency="false" />-->
     </ItemGroup>
   </Target>
 
