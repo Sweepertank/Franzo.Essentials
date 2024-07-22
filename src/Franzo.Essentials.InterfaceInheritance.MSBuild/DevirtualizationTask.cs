@@ -11,17 +11,10 @@ public class DevirtualizationTask : Microsoft.Build.Utilities.Task
 
     public override bool Execute()
     {
-        MemoryStream memory;
-        using (var stream = File.OpenRead(AssemblyPath))
+        var module = ModuleDefinition.ReadModule(AssemblyPath, new ReaderParameters()
         {
-            memory = new MemoryStream((int)stream.Length);
-            stream.CopyTo(memory);
-            memory.Position = 0;
-        }
-
-        var module = ModuleDefinition.ReadModule(memory, new ReaderParameters()
-        {
-            InMemory = true
+            InMemory = true,
+            ReadSymbols = true
         });
 
         foreach (var type in module.GetTypes())
@@ -56,10 +49,12 @@ public class DevirtualizationTask : Microsoft.Build.Utilities.Task
             }
         }
 
-        using (var stream = File.Open(AssemblyPath, FileMode.Create, FileAccess.Write))
+        module.Write(AssemblyPath, new WriterParameters()
         {
-            module.Write(stream);
-        }
+            WriteSymbols = true
+        });
+
+        module.Dispose();
 
         return true;
     }
@@ -73,7 +68,6 @@ public class DevirtualizationTask : Microsoft.Build.Utilities.Task
 
         foreach (var instruction in method.Body.Instructions)
         {
-            //instruction.
             if (instruction.OpCode == OpCodes.Callvirt)
             {
                 instruction.OpCode = OpCodes.Call;
