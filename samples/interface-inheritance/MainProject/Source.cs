@@ -114,7 +114,7 @@ public partial interface IEntityResource : IEntity, IResource
             Console.WriteLine("TestInheritances3 - get");
             return "";
         }
-        set
+        private protected set
         {
             Console.WriteLine("TestInheritances3 - set");
         }
@@ -140,7 +140,7 @@ public partial interface IEntityResource : IEntity, IResource
             Console.WriteLine("TestInheritances7 - get");
             return "";
         }
-        set
+        internal set
         {
             Console.WriteLine("TestInheritances7 - set");
         }

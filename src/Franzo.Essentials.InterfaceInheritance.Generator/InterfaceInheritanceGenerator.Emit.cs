@@ -966,6 +966,8 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         {
             writer.Write("private protected");
         }
+
+        writer.Write(" ");
     }
 
     private static void EmitFieldInheritanceCore(
