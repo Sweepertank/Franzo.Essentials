@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using Franzo.Essentials.InterfaceInheritance;
+using ReferencedProject;
 
 namespace MainProject;
 
@@ -181,6 +182,8 @@ public partial interface IEntityResource : IEntity, IResource
 }
 
 [InheritInterface<IEntityResource>]
+[InheritInterface<IDataless>]
+[InheritInterface<IDataful>]
 public partial class Greg
 {
     private int Goofus { get; set; }
@@ -188,6 +191,7 @@ public partial class Greg
     public Greg()
     {
         EntityResourceData = ConstructEntityResource(1, 2);
+        DatafulData = ConstructDataful();
 
         TestProxies();
 
@@ -202,6 +206,10 @@ public partial class Greg
         TestInheritances7 = TestInheritances7;
         TestInheritances8 += null!;
         TestInheritances8 -= null!;
+
+        DatalessMethod();
+        DatafulMethod();
+        DatafulProperty = DatafulProperty;
 
         BloodyEllArry();
     }

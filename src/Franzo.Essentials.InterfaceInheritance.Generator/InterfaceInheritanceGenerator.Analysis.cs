@@ -405,26 +405,26 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         InternalAnalysisContext context,
         bool isDataClassFromMetadata)
     {
-        var type = new InternalTypeSymbol(roslynType, containingType);
+        var type = new InternalTypeSymbol(roslynType, containingType, context);
 
         foreach (var roslynFeature in roslynType.GetMembers())
         {
             InternalFeatureSymbol feature;
             if (roslynFeature is IPropertySymbol roslynProperty)
             {
-                feature = new InternalPropertySymbol(roslynProperty);
+                feature = new InternalPropertySymbol(roslynProperty, context);
             }
             else if (roslynFeature is IFieldSymbol roslynField)
             {
-                feature = new InternalFieldSymbol(roslynField);
+                feature = new InternalFieldSymbol(roslynField, context);
             }
             else if (roslynFeature is IMethodSymbol roslynMethod)
             {
-                feature = new InternalMethodSymbol(roslynMethod);
+                feature = new InternalMethodSymbol(roslynMethod, context);
             }
             else if (roslynFeature is IEventSymbol roslynEvent)
             {
-                feature = new InternalEventSymbol(roslynEvent);
+                feature = new InternalEventSymbol(roslynEvent, context);
             }
             else
             {
@@ -440,7 +440,8 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                 context.Data.TypesCreatedDuringTypeInitializationPhase1.Add(type);
                 break;
             case AnalysisPhase.TypeInitializationPhase2:
-                if (roslynType.IsFromMetadata() && !isDataClassFromMetadata)
+                if (!roslynType.ContainingAssembly.CorrectEquals(context.Compilation.Assembly)
+                    && !isDataClassFromMetadata)
                 {
                     InitializeTypeBaseTypesAndColonSpecifiedInterfaces(type, context);
 

@@ -11,7 +11,8 @@ internal class InternalEventSymbol :
         get => (IEventSymbol)base.RoslynSymbol;
     }
 
-    public InternalEventSymbol(IEventSymbol roslynSymbol) : base(roslynSymbol)
+    public InternalEventSymbol(IEventSymbol roslynSymbol, InternalAnalysisContext context)
+        : base(roslynSymbol, context)
     {
     }
 }

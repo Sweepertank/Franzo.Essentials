@@ -11,7 +11,8 @@ internal class InternalMethodSymbol :
         get => (IMethodSymbol)base.RoslynSymbol;
     }
 
-    public InternalMethodSymbol(IMethodSymbol roslynSymbol) : base(roslynSymbol)
+    public InternalMethodSymbol(IMethodSymbol roslynSymbol, InternalAnalysisContext context)
+        : base(roslynSymbol, context)
     {
     }
 }

@@ -941,6 +941,9 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         IPropertySymbol property,
         IndentedTextWriter writer)
     {
+        // @todo: figure out a way to suppress 'declared but never used' messages
+        // for non-public properties/events defined in a data class
+        // maybe generate, for each one, a dummy method (local function?) that accesses the property/event
         if (accessor.DeclaredAccessibility == property.DeclaredAccessibility)
         {
             return;

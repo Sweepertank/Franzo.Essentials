@@ -24,10 +24,12 @@ internal class InternalTypeSymbol : InternalSymbol, IInternalTypeSymbol
         get
         {
             IEnumerable<InternalFeatureSymbol> result = SourceDeclaredFeatures;
-            if (DataClass is not null)
+            if (DataClass is not null
+                && RoslynSymbol.ContainingAssembly.CorrectEquals(Context.Compilation.Assembly))
             {
-                result = result.Concat(
-                    DataClass.DeclaredProperties.Where(p => !p.RoslynSymbol.IsIndexer));
+                result = result
+                    .Concat(DataClass.DeclaredProperties.Where(p => !p.RoslynSymbol.IsIndexer))
+                    .Concat(DataClass.DeclaredEvents);
             }
 
             return result;
@@ -87,8 +89,11 @@ internal class InternalTypeSymbol : InternalSymbol, IInternalTypeSymbol
             AttributeSpecifiedDirectInterfaces.SelectMany(i => i.Interfaces)).Distinct();
     }
 
-    public InternalTypeSymbol(INamedTypeSymbol roslynSymbol, InternalTypeSymbol? containingType)
-        : base(roslynSymbol)
+    public InternalTypeSymbol(
+        INamedTypeSymbol roslynSymbol,
+        InternalTypeSymbol? containingType,
+        InternalAnalysisContext context)
+        : base(roslynSymbol, context)
     {
         ContainingType = containingType;
     }

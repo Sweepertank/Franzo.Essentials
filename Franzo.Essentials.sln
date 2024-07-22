@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Franzo.Essentials.Tests", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MainProject", "samples\interface-inheritance\MainProject\MainProject.csproj", "{82A568B3-65B1-4C32-8001-059B05D5EC78}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Franzo.Essentials.InterfaceInheritance.MSBuild", "src\Franzo.Essentials.InterfaceInheritance.MSBuild\Franzo.Essentials.InterfaceInheritance.MSBuild.csproj", "{567EB4B0-7511-4CAB-8FDF-69D18589A5F3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Franzo.Essentials.InterfaceInheritance.MSBuild", "src\Franzo.Essentials.InterfaceInheritance.MSBuild\Franzo.Essentials.InterfaceInheritance.MSBuild.csproj", "{567EB4B0-7511-4CAB-8FDF-69D18589A5F3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReferencedProject", "samples\interface-inheritance\ReferencedProject\ReferencedProject.csproj", "{776C53BA-5EFD-42F8-BD2A-9EEF34E6D365}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{567EB4B0-7511-4CAB-8FDF-69D18589A5F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{567EB4B0-7511-4CAB-8FDF-69D18589A5F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{567EB4B0-7511-4CAB-8FDF-69D18589A5F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{776C53BA-5EFD-42F8-BD2A-9EEF34E6D365}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{776C53BA-5EFD-42F8-BD2A-9EEF34E6D365}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{776C53BA-5EFD-42F8-BD2A-9EEF34E6D365}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{776C53BA-5EFD-42F8-BD2A-9EEF34E6D365}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

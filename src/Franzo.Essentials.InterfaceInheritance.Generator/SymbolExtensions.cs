@@ -32,11 +32,6 @@ internal static class SymbolExtensions
             .GetMethod;
     }
 
-    public static bool IsFromMetadata(this ISymbol self)
-    {
-        return self.DeclaringSyntaxReferences.Length == 0;
-    }
-
     public static bool IsAccessibleWithin(
         this ISymbol self,
         ISymbol within,
