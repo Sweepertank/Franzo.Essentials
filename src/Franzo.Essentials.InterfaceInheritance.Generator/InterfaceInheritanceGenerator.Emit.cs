@@ -128,6 +128,11 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             writer.Write(type.RoslynSymbol.ToDisplayString());
             writer.Write(").GetConstructors()[0];");
             writer.WriteLine();
+
+            foreach (var @event in type.DeclaredEvents)
+            {
+                EmitDataClassEventInvokeMethod(@event, type, writer, context);
+            }
         }
 
         if (type.RoslynSymbol.TypeKind.IsClassOrStruct())
@@ -236,6 +241,20 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         }
 
         writer.WriteBracedSectionEnd();
+    }
+
+    private static void EmitDataClassEventInvokeMethod(
+        InternalEventSymbol @event,
+        InternalTypeSymbol type,
+        IndentedTextWriter writer,
+        Context context)
+    {
+        EmitEventInvokeMethod(
+            @event.RoslynSymbol,
+            type.RoslynSymbol,
+            writer,
+            context,
+            isProxy: false);
     }
 
     private static void EmitRealDataFieldsAndDataPropertyImplementations(
@@ -941,9 +960,6 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         IPropertySymbol property,
         IndentedTextWriter writer)
     {
-        // @todo: figure out a way to suppress 'declared but never used' messages
-        // for non-public properties/events defined in a data class
-        // maybe generate, for each one, a dummy method (local function?) that accesses the property/event
         if (accessor.DeclaredAccessibility == property.DeclaredAccessibility)
         {
             return;
@@ -1188,7 +1204,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             withinType,
             writer,
             context,
-            isForUnsafeAccessor);
+            isForUnsafeAccessor: isForUnsafeAccessor);
         writer.Write(")");
 
         foreach (var typeParameter in method.TypeParameters)
@@ -1448,6 +1464,70 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         }
 
         writer.WriteBracedSectionEnd();
+
+        EmitEventInvokeMethod(@event, withinType, writer, context, isProxy: true);
+    }
+
+    private static void EmitEventInvokeMethod(
+        IEventSymbol @event,
+        INamedTypeSymbol withinType,
+        IndentedTextWriter writer,
+        Context context,
+        bool isProxy)
+    {
+        if (@event.Type is INamedTypeSymbol { DelegateInvokeMethod: not null } eventType)
+        {
+            if (isProxy)
+            {
+                writer.Write("private");
+            }
+            else
+            {
+                writer.Write("public");
+            }
+            writer.Write(" ");
+            if (@event.IsStatic)
+            {
+                writer.Write("static ");
+            }
+            writer.Write(eventType.DelegateInvokeMethod.ReturnType.ToFullyQualifiedDisplayString());
+            writer.Write(" ");
+            writer.Write(@event.Name);
+            writer.Write("_Invoke");
+            EmitMethodParameterList(
+                eventType.DelegateInvokeMethod,
+                withinType,
+                writer,
+                context);
+            writer.WriteLine();
+
+            writer.WriteBracedSectionStart();
+
+            if (!eventType.DelegateInvokeMethod.ReturnsVoid)
+            {
+                writer.Write("return ");
+            }
+            if (isProxy)
+            {
+                writer.Write(GeneratedInterfaceDataPropertyName);
+                writer.Write(".");
+                writer.Write(@event.Name);
+                writer.Write("_");
+            }
+            else
+            {
+                writer.Write(@event.Name);
+                writer.Write("?.");
+            }
+            writer.Write("Invoke(");
+            EmitUnparenthesizedArgumentListFromParameters(
+                eventType.DelegateInvokeMethod.Parameters,
+                writer);
+            writer.Write(");");
+            writer.WriteLine();
+
+            writer.WriteBracedSectionEnd();
+        }
     }
 
     private static void EmitUnsafeGetterForProperty(

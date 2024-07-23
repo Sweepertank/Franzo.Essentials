@@ -33,7 +33,7 @@ public partial interface IEntity
 
     public void BloodyEllArry<T, U>(object? s, [NotNull] int f) where T : class? where U : IIgnored, new()
     {
-
+        Bark2_Invoke(this, EventArgs.Empty);
     }
 
     public int BloodyEllArry()
@@ -170,6 +170,7 @@ public partial interface IEntityResource : IEntity, IResource
 
     public void HeckleBeckleA()
     {
+        Yorkifier_Invoke(this, 0);
     }
 
     protected void HeckleBeckleB()
