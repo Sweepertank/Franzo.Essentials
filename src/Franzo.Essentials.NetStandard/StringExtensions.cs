@@ -4,9 +4,9 @@ namespace Franzo.Essentials;
 
 public static class StringExtensions
 {
-    public static string RemoveStartingAtFirstIndexOf(this string self, char character)
+    public static string RemoveStartingAtFirst(this string self, char c)
     {
-        var index = self.IndexOf(character);
+        var index = self.IndexOf(c);
         if (index < 0)
         {
             return self;
@@ -15,9 +15,9 @@ public static class StringExtensions
         return self.Remove(index);
     }
 
-    public static string RemoveStartingAtLastIndexOf(this string self, char character)
+    public static string RemoveStartingAtLast(this string self, char c)
     {
-        var index = self.LastIndexOf(character);
+        var index = self.LastIndexOf(c);
         if (index < 0)
         {
             return self;
@@ -26,9 +26,9 @@ public static class StringExtensions
         return self.Remove(index);
     }
 
-    public static string RemoveUpToAndIncludingLastIndexOf(this string self, char character)
+    public static string RemoveUpToAndIncludingLast(this string self, char c)
     {
-        var index = self.LastIndexOf(character);
+        var index = self.LastIndexOf(c);
         if (index < 0)
         {
             return self;
@@ -37,9 +37,9 @@ public static class StringExtensions
         return self.Remove(0, index + 1);
     }
 
-    public static string RemoveUpToAndIncludingFirstIndexOf(this string self, char character)
+    public static string RemoveUpToAndIncludingFirst(this string self, char c)
     {
-        var index = self.IndexOf(character);
+        var index = self.IndexOf(c);
         if (index < 0)
         {
             return self;

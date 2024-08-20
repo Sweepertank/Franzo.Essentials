@@ -91,7 +91,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         }
 
         writer.Write(" ");
-        writer.Write(type.RoslynSymbol.Name);
+        writer.Write(type.RoslynSymbol.ToSimpleDisplayString());
 
         if (type.IsDataClass)
         {

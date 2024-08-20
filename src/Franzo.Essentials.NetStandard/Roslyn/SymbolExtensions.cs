@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -10,6 +11,34 @@ public static class SymbolExtensions
     private static SymbolDisplayFormat FullyQualifiedWithNullableReferenceTypeAnnotationsFormat =
         SymbolDisplayFormat.FullyQualifiedFormat.AddMiscellaneousOptions(
             SymbolDisplayMiscellaneousOptions.IncludeNullableReferenceTypeModifier);
+
+    // Adapted from CSharpShortErrorMessageFormat
+    // in https://github.com/dotnet/roslyn/src/Compilers/Core/Portable/SymbolDisplay/SymbolDisplayFormat.cs
+    private static SymbolDisplayFormat SimpleFormat = new SymbolDisplayFormat(
+        globalNamespaceStyle: SymbolDisplayGlobalNamespaceStyle.OmittedAsContaining,
+        typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameOnly,
+        propertyStyle: SymbolDisplayPropertyStyle.NameOnly,
+        genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters,
+        memberOptions:
+            SymbolDisplayMemberOptions.IncludeParameters |
+            SymbolDisplayMemberOptions.IncludeContainingType |
+            SymbolDisplayMemberOptions.IncludeExplicitInterface,
+        parameterOptions:
+            SymbolDisplayParameterOptions.IncludeParamsRefOut |
+            SymbolDisplayParameterOptions.IncludeType,
+        miscellaneousOptions:
+            SymbolDisplayMiscellaneousOptions.EscapeKeywordIdentifiers |
+            SymbolDisplayMiscellaneousOptions.UseSpecialTypes |
+            SymbolDisplayMiscellaneousOptions.UseAsterisksInMultiDimensionalArrays |
+            SymbolDisplayMiscellaneousOptions.UseErrorTypeSymbolName |
+            SymbolDisplayMiscellaneousOptions.IncludeNullableReferenceTypeModifier);
+
+    static SymbolExtensions()
+    {
+        var formatConstructor = typeof(SymbolDisplayFormat)
+            .GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance)
+            .Single();
+    }
 
     public static bool CorrectEquals(this ISymbol? self, ISymbol? other)
     {
@@ -60,6 +89,16 @@ public static class SymbolExtensions
     public static string ToFullyQualifiedDisplayString(this ISymbol self)
     {
         return self.ToDisplayString(FullyQualifiedWithNullableReferenceTypeAnnotationsFormat);
+    }
+
+    public static string ToCSharpShortErrorMessageString(this ISymbol self)
+    {
+        return self.ToDisplayString(SymbolDisplayFormat.CSharpShortErrorMessageFormat);
+    }
+
+    public static string ToSimpleDisplayString(this ISymbol self)
+    {
+        return self.ToDisplayString(SimpleFormat);
     }
 
     public static void WriteVerbatimizedName(this ISymbol self, TextWriter writer)

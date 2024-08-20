@@ -1,11 +1,34 @@
-using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using Franzo.Essentials.InterfaceInheritance;
-using ReferencedProject;
 
 namespace MainProject;
 
-public interface IIgnored
+public partial interface IGeneric<T>
+{
+    [InterfaceData]
+    public partial class Data_
+    {
+        public int Goofy { get; }
+
+        public Data_()
+        {
+        }
+    }
+}
+
+public partial interface IDerivedGeneric<T> : IGeneric<T>
+{
+    [InterfaceData]
+    public new partial class Data_
+    {
+        public int Goofy2 { get; }
+
+        public Data_()
+        {
+        }
+    }
+}
+
+/*public interface IIgnored
 {
 }
 
@@ -214,7 +237,7 @@ public partial class Greg
 
         BloodyEllArry();
     }
-}
+}*/
 
 /*using Franzo.Essentials.InterfaceInheritance;
 

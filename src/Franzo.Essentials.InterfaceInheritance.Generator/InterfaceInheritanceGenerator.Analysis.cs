@@ -20,6 +20,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
     {
         foreach (var roslynType in context.PossiblyRelevantTopLevelRoslynTypes)
         {
+            var x = roslynType.IsConstructedGenericType();
             var type = CreateTypeIfEmitting(roslynType, null, context);
             if (type is null) continue;
 
@@ -95,7 +96,9 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                 invalid = true;
             }
 
-            if (type.RoslynSymbol.IsGenericType)
+            // Check this *instead* of IsGenericType, because we don't want this to pass for
+            // a class without generic parameters nested inside a class *with* generic parameters
+            if (type.RoslynSymbol.TypeParameters.Length > 0)
             {
                 context.ReportDiagnostic(
                     Diagnostic.Create(
@@ -403,7 +406,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         InternalTypeSymbol? containingType,
         AnalysisPhase phase,
         InternalAnalysisContext context,
-        bool isDataClassFromMetadata)
+        bool isADataClassFromMetadata)
     {
         var type = new InternalTypeSymbol(roslynType, containingType, context);
 
@@ -440,8 +443,9 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                 context.Data.TypesCreatedDuringTypeInitializationPhase1.Add(type);
                 break;
             case AnalysisPhase.TypeInitializationPhase2:
-                if (!roslynType.ContainingAssembly.CorrectEquals(context.Compilation.Assembly)
-                    && !isDataClassFromMetadata)
+                if ((!roslynType.ContainingAssembly.CorrectEquals(context.Compilation.Assembly)
+                     && !isADataClassFromMetadata)
+                    || roslynType.IsConstructedGenericType())
                 {
                     InitializeTypeBaseTypesAndColonSpecifiedInterfaces(type, context);
 
