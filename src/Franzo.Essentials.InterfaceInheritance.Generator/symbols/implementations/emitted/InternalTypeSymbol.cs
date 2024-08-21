@@ -18,6 +18,7 @@ internal class InternalTypeSymbol : InternalSymbol, IInternalTypeSymbol
     public InternalTypeSymbol? DataClass = null;
     public bool IsDataClass = false;
     public InternalMethodSymbol? ConstructorIfDataClass = null;
+    public bool EmitDefaultConstructor = false;
 
     public IEnumerable<InternalFeatureSymbol> DeclaredFeatures
     {
@@ -87,6 +88,16 @@ internal class InternalTypeSymbol : InternalSymbol, IInternalTypeSymbol
     {
         get => AttributeSpecifiedDirectInterfaces.Concat(
             AttributeSpecifiedDirectInterfaces.SelectMany(i => i.Interfaces)).Distinct();
+    }
+
+    public InternalTypeSymbol AnchorType
+    {
+        get => IsDataClass ? ContainingType! : this;
+    }
+
+    public bool HasExplicitlyDeclaredConstructor
+    {
+        get => DeclaredConstructors.Any(c => !c.RoslynSymbol.IsImplicitlyDeclared);
     }
 
     public InternalTypeSymbol(

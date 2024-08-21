@@ -365,11 +365,56 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         }
         else
         {
+            if (type.DataClass is null
+                && type.ColonSpecifiedDirectInterfaces.Any(i => i.DataClass is not null))
+            {
+                context.ReportDiagnostic(
+                    Diagnostic.Create(
+                        DiagnosticDescriptors.Dummy,
+                        type.RoslynSymbol.Locations.First()));
+            }
+
             foreach (var feature in type.DeclaredFeatures)
             {
                 if (feature.RoslynSymbol.HasOverrideAttribute())
                 {
                     feature.HasOverrideAttribute = true;
+                }
+            }
+        }
+
+        if (type.RoslynSymbol.TypeKind.IsClassOrStruct())
+        {
+            if (!type.HasExplicitlyDeclaredConstructor)
+            {
+                var enableEmitDefaultConstructor = false;
+                foreach (var @interface in type.AnchorType.DirectInterfaces)
+                {
+                    if (@interface.DataClass is not null
+                        && !@interface.DataClass.ConstructorIfDataClass!.RoslynSymbol.CanBeCalledWithZeroArgumentsInSource())
+                    {
+                        context.ReportDiagnostic(
+                            Diagnostic.Create(
+                                DiagnosticDescriptors.Dummy,
+                                type.RoslynSymbol.Locations.First()));
+                        enableEmitDefaultConstructor = true;
+                        break;
+                    }
+                }
+
+                if (type.BaseType is not null)
+                {
+                    if (!type.BaseType.DeclaredConstructors.Any(
+                        c => c.RoslynSymbol.IsAccessibleWithin(type.RoslynSymbol, context.Compilation)
+                            && c.RoslynSymbol.CanBeCalledWithZeroArgumentsInSource()))
+                    {
+                        enableEmitDefaultConstructor = true;
+                    }
+                }
+
+                if (!enableEmitDefaultConstructor)
+                {
+                    type.EmitDefaultConstructor = true;
                 }
             }
         }
@@ -462,6 +507,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                                 AnalysisPhase.TypeInitializationPhase2,
                                 context,
                                 true);
+                            dataClass.IsDataClass = true;
                             dataClass.ConstructorIfDataClass = dataClass.DeclaredConstructors.First();
 
                             type.DataClass = dataClass;

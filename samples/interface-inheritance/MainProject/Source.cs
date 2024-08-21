@@ -1,4 +1,7 @@
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using Franzo.Essentials.InterfaceInheritance;
+using ReferencedProject;
 
 namespace MainProject;
 
@@ -21,14 +24,27 @@ public partial interface IDerivedGeneric<T> : IGeneric<T>
     public new partial class Data_
     {
         public int Goofy2 { get; }
-
-        public Data_()
-        {
-        }
     }
 }
 
-/*public interface IIgnored
+public class Blurb
+{
+    public Blurb()
+    {
+
+    }
+
+    public Blurb(int f)
+    {
+    }
+}
+
+[InheritInterface("IDerivedGeneric<T>")]
+public partial class GenericClass<T> : Blurb
+{
+}
+
+public interface IIgnored
 {
 }
 
@@ -237,7 +253,7 @@ public partial class Greg
 
         BloodyEllArry();
     }
-}*/
+}
 
 /*using Franzo.Essentials.InterfaceInheritance;
 

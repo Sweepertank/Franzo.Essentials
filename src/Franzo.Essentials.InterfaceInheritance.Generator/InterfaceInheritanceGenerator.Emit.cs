@@ -235,6 +235,29 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             EmitAsInterfaceMethod(@interface, writer, context);
         }
 
+        if (type.EmitDefaultConstructor)
+        {
+            writer.Write("public ");
+            writer.Write(type.RoslynSymbol.Name);
+            writer.Write("()");
+            writer.WriteLine();
+
+            writer.WriteBracedSectionStart();
+
+            foreach (var @interface in type.AnchorType.DirectInterfaces)
+            {
+                if (@interface.DataClass is null) continue;
+
+                EmitFakeDataFieldName(@interface, writer);
+                writer.Write(" = ");
+                EmitConstructMethodName(@interface, writer);
+                writer.Write("();");
+                writer.WriteLine();
+            }
+
+            writer.WriteBracedSectionEnd();
+        }
+
         foreach (var memberType in type.DeclaredTypes)
         {
             EmitType(memberType, writer, context);
@@ -332,13 +355,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         IndentedTextWriter writer,
         Context context)
     {
-        var anchorType = type;
-        if (type.IsDataClass)
-        {
-            anchorType = type.ContainingType!;
-        }
-
-        foreach (var @interface in anchorType.DirectInterfaces)
+        foreach (var @interface in type.AnchorType.DirectInterfaces)
         {
             if (@interface.DataClass is null) continue;
 
@@ -352,7 +369,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             writer.WriteLine();
         }
 
-        foreach (var @interface in anchorType.DirectInterfaces)
+        foreach (var @interface in type.AnchorType.DirectInterfaces)
         {
             if (@interface.DataClass is null) continue;
 
@@ -360,8 +377,8 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             writer.Write(@interface.RoslynSymbol.ToFullyQualifiedDisplayString());
             writer.Write(".");
             writer.Write(InterfaceDataClassName);
-            writer.Write(" Construct");
-            writer.Write(@interface.RoslynSymbol.Name.WithoutInterfaceI());
+            writer.Write(" ");
+            EmitConstructMethodName(@interface, writer);
             EmitMethodParameterList(
                 @interface.DataClass.ConstructorIfDataClass!.RoslynSymbol,
                 type.RoslynSymbol,
@@ -444,6 +461,14 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
     {
         writer.Write(@interface.RoslynSymbol.Name.WithoutInterfaceI());
         writer.Write("Data");
+    }
+
+    private static void EmitConstructMethodName(
+        InternalTypeSymbol @interface,
+        IndentedTextWriter writer)
+    {
+        writer.Write("Construct");
+        writer.Write(@interface.RoslynSymbol.Name.WithoutInterfaceI());
     }
 
     private static void EmitRealDataFieldName(

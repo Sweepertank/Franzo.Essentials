@@ -4,6 +4,10 @@ namespace Franzo.Essentials;
 
 internal static class MethodSymbolExtensions
 {
+    public static bool CanBeCalledWithZeroArgumentsInSource(this IMethodSymbol self)
+    {
+        return self.Parameters.All(p => p.HasExplicitDefaultValue);
+    }
     /*public static bool AccessorIsInheritable(
         this IMethodSymbol self)
     {
