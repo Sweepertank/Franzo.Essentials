@@ -207,18 +207,16 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                     continue;
                 }
 
-                foreach (var shadowingType in feature.TypesDeclaringShadowingFeatures)
-                {
-                    if (type.RoslynSymbol.IsAssignableTo(
+                if (feature.TypesDeclaringShadowingFeatures.Any(
+                    shadowingType => type.RoslynSymbol.IsAssignableTo(
                             shadowingType.RoslynSymbol,
                             context.Compilation)
                         || type.AttributeSpecifiedDirectInterfaces.Any(
                             i => i.RoslynSymbol.IsAssignableTo(
                                 shadowingType.RoslynSymbol,
-                                context.Compilation)))
-                    {
-                        continue;
-                    }
+                                context.Compilation))))
+                {
+                    continue;
                 }
 
                 EmitFeatureInheritance(

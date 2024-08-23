@@ -1,11 +1,33 @@
-using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using Franzo.Essentials.InterfaceInheritance;
-using ReferencedProject;
 
 namespace MainProject;
 
-public partial interface IGeneric<T>
+public interface IAa
+{
+    public int Yupple
+    {
+        get => 0;
+    }
+}
+
+public interface IBb : IAa
+{
+    public new int Yupple
+    {
+        get => 1;
+    }
+}
+
+[InheritInterface<IBb>]
+public partial class Cc
+{
+    public Cc()
+    {
+        Console.WriteLine(Yupple);
+    }
+}
+
+/*public partial interface IGeneric<T>
 {
     [InterfaceData]
     public partial class Data_
