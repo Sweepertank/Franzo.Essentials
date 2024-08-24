@@ -2,7 +2,7 @@ using Franzo.Essentials.InterfaceInheritance;
 
 namespace MainProject;
 
-public interface IAa
+public partial interface IAa
 {
     public int Yupple
     {
@@ -10,7 +10,7 @@ public interface IAa
     }
 }
 
-public interface IBb : IAa
+public partial interface IBb : IAa
 {
     public new int Yupple
     {
