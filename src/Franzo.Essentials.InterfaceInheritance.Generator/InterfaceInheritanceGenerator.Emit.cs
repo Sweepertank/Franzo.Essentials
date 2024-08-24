@@ -23,6 +23,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         writer.WriteLine("#pragma warning disable CS0108");
         writer.WriteLine("#pragma warning disable CS0618");
         writer.WriteLine("#pragma warning disable CS8387");
+        writer.WriteLine("#pragma warning disable CS0114");
         writer.WriteLine();
 
         foreach (var type in context.AnalysisData.RootTypesToEmit)
