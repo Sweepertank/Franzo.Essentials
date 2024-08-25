@@ -1,5 +1,3 @@
-using Franzo.Essentials.InterfaceInheritance;
-
 namespace MainProject;
 
 public partial interface IAa
@@ -18,7 +16,6 @@ public partial interface IBb : IAa
     }
 }
 
-[InheritInterface<IBb>]
 public partial class Cc : IBb
 {
     public Cc()

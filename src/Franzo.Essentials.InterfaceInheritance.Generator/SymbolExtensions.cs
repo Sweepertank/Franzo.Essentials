@@ -41,11 +41,11 @@ internal static class SymbolExtensions
         return compilation.IsSymbolAccessibleWithin(self, within, throughType);
     }
 
-    public static bool HasInheritInterfaceAttribute(this ISymbol self)
+    /*public static bool HasInheritInterfaceAttribute(this ISymbol self)
     {
         return self.HasAttribute<InheritInterfaceAttribute>()
             || self.HasGenericAttribute(typeof(InheritInterfaceAttribute<>));
-    }
+    }*/
 
     public static bool HasInterfaceDataAttribute(this ISymbol self)
     {

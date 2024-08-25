@@ -1,6 +1,6 @@
 namespace Franzo.Essentials.InterfaceInheritance;
 
-[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = true)]
+/*[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = true)]
 public class InheritInterfaceAttribute : Attribute
 {
     public InheritInterfaceAttribute(string interfaceName)
@@ -14,4 +14,4 @@ public class InheritInterfaceAttribute<T> : InheritInterfaceAttribute where T : 
     public InheritInterfaceAttribute() : base("")
     {
     }
-}
+}*/

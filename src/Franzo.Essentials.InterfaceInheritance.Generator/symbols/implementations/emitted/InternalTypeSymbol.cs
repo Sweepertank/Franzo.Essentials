@@ -12,7 +12,6 @@ internal class InternalTypeSymbol : InternalSymbol, IInternalTypeSymbol
     //public bool HasInitializedBaseTypesAndInterfaces = false;
     public bool HasPhase1Analyzed = false;
     public List<InternalTypeSymbol> DeclaredTypes = new();
-    public List<InternalTypeSymbol> AttributeSpecifiedDirectInterfaces = new();
     public List<InternalTypeSymbol> ColonSpecifiedDirectInterfaces = new();
     public List<InternalFeatureSymbol> SourceDeclaredFeatures = new();
     public InternalTypeSymbol? DataClass = null;
@@ -64,7 +63,7 @@ internal class InternalTypeSymbol : InternalSymbol, IInternalTypeSymbol
 
     public IEnumerable<InternalTypeSymbol> DirectInterfaces
     {
-        get => AttributeSpecifiedDirectInterfaces.Concat(ColonSpecifiedDirectInterfaces);
+        get => ColonSpecifiedDirectInterfaces; //AttributeSpecifiedDirectInterfaces.Concat(ColonSpecifiedDirectInterfaces);
     }
 
     public IEnumerable<InternalTypeSymbol> Interfaces
@@ -82,12 +81,6 @@ internal class InternalTypeSymbol : InternalSymbol, IInternalTypeSymbol
                 yield return @interface;
             }
         }
-    }
-
-    public IEnumerable<InternalTypeSymbol> InterfacesInheriting
-    {
-        get => AttributeSpecifiedDirectInterfaces.Concat(
-            AttributeSpecifiedDirectInterfaces.SelectMany(i => i.Interfaces)).Distinct();
     }
 
     public InternalTypeSymbol AnchorType

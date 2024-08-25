@@ -174,58 +174,62 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             writer.Write(" { get; }");
             writer.WriteLine();
         }
-        foreach (var @interface in type.InterfacesInheriting)
+
+        if (type.RoslynSymbol.TypeKind.IsClassOrStruct())
         {
-            foreach (var feature in @interface.DeclaredFeatures)
+            foreach (var @interface in type.Interfaces)
             {
-                if (!(feature.RoslynSymbol.IsAccessibleFromType(
-                        type.RoslynSymbol,
-                        context.Compilation)
-                     || feature.RoslynSymbol.DeclaredAccessibility is Accessibility.Protected
-                     || (feature.RoslynSymbol.DeclaredAccessibility is Accessibility.ProtectedAndInternal
-                         && feature.RoslynSymbol.ContainingAssembly.GivesAccessTo(
-                                type.RoslynSymbol.ContainingAssembly)))
-                    || feature.RoslynSymbol is IMethodSymbol
-                    {
-                        MethodKind: MethodKind.PropertyGet
-                            or MethodKind.PropertySet
-                            or MethodKind.EventAdd
-                            or MethodKind.EventRemove
-                    }
-                    || feature.RoslynSymbol is IFieldSymbol
-                    {
-                        IsConst: false,
-                        IsReadOnly: false
-                    }
-                    // @todo: once partial properties are in,
-                    // we should change this so that we *do* emit inheritances for public abstract properties and methods,
-                    // but just mark them them as partial
-                    // (ideally we would do so for events too, but it doesn't look like partial events are coming any time soon)
-                    || (feature.RoslynSymbol.DeclaredAccessibility is Accessibility.Public
-                        && feature.RoslynSymbol.IsAbstract)
-                    || feature.RoslynSymbol.Name == type.RoslynSymbol.Name)
+                foreach (var feature in @interface.DeclaredFeatures)
                 {
-                    continue;
-                }
-
-                if (feature.TypesDeclaringShadowingFeatures.Any(
-                    shadowingType => type.RoslynSymbol.IsAssignableTo(
-                            shadowingType.RoslynSymbol,
+                    if (!(feature.RoslynSymbol.IsAccessibleFromType(
+                            type.RoslynSymbol,
                             context.Compilation)
-                        || type.AttributeSpecifiedDirectInterfaces.Any(
-                            i => i.RoslynSymbol.IsAssignableTo(
-                                shadowingType.RoslynSymbol,
-                                context.Compilation))))
-                {
-                    continue;
-                }
+                        || feature.RoslynSymbol.DeclaredAccessibility is Accessibility.Protected
+                        || (feature.RoslynSymbol.DeclaredAccessibility is Accessibility.ProtectedAndInternal
+                            && feature.RoslynSymbol.ContainingAssembly.GivesAccessTo(
+                                    type.RoslynSymbol.ContainingAssembly)))
+                        || feature.RoslynSymbol is IMethodSymbol
+                        {
+                            MethodKind: MethodKind.PropertyGet
+                                or MethodKind.PropertySet
+                                or MethodKind.EventAdd
+                                or MethodKind.EventRemove
+                        }
+                        || feature.RoslynSymbol is IFieldSymbol
+                        {
+                            IsConst: false,
+                            IsReadOnly: false
+                        }
+                        // @todo: once partial properties are in,
+                        // we should change this so that we *do* emit inheritances for public abstract properties and methods,
+                        // but just mark them them as partial
+                        // (ideally we would do so for events too, but it doesn't look like partial events are coming any time soon)
+                        || (feature.RoslynSymbol.DeclaredAccessibility is Accessibility.Public
+                            && feature.RoslynSymbol.IsAbstract)
+                        || feature.RoslynSymbol.Name == type.RoslynSymbol.Name)
+                    {
+                        continue;
+                    }
 
-                EmitFeatureInheritance(
-                    feature,
-                    @interface.RoslynSymbol,
-                    type.RoslynSymbol,
-                    writer,
-                    context);
+                    if (feature.TypesDeclaringShadowingFeatures.Any(
+                        shadowingType => type.RoslynSymbol.IsAssignableTo(
+                                shadowingType.RoslynSymbol,
+                                context.Compilation)
+                            || type.DirectInterfaces.Any(
+                                i => i.RoslynSymbol.IsAssignableTo(
+                                    shadowingType.RoslynSymbol,
+                                    context.Compilation))))
+                    {
+                        continue;
+                    }
+
+                    EmitFeatureInheritance(
+                        feature,
+                        @interface.RoslynSymbol,
+                        type.RoslynSymbol,
+                        writer,
+                        context);
+                }
             }
         }
 
@@ -284,7 +288,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         IndentedTextWriter writer,
         Context context)
     {
-        foreach (var @interface in type.InterfacesInheriting)
+        foreach (var @interface in type.Interfaces)
         {
             if (@interface.DataClass is null) continue;
 
@@ -310,7 +314,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             writer.Indent--;
         }
 
-        foreach (var @interface in type.InterfacesInheriting)
+        foreach (var @interface in type.Interfaces)
         {
             if (@interface.DataClass is null) continue;
 

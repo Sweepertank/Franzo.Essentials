@@ -51,11 +51,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             type.DeclaredTypes.Add(declaredType);
         }
 
-        if (type.DeclaredTypes.Count == 0
-            && !roslynType.HasInheritInterfaceAttribute()
-            && !roslynType.HasInterfaceDataAttribute()
-            && !(type.RoslynSymbol.TypeKind is TypeKind.Interface
-                 && type.AreSelfAndContainingTypesPartiallyDeclared()))
+        if (type.DeclaredTypes.Count == 0 && !roslynType.IsPartiallyDeclared())
         {
             return null;
         }
@@ -168,7 +164,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             }
         }
 
-        foreach (var attribute in type.RoslynSymbol.GetGenericAttributes(typeof(InheritInterfaceAttribute<>)))
+        /*foreach (var attribute in type.RoslynSymbol.GetGenericAttributes(typeof(InheritInterfaceAttribute<>)))
         {
             var invalid = false;
 
@@ -324,7 +320,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             if (invalid) continue;
 
             type.AttributeSpecifiedDirectInterfaces.Add(@interface);
-        }
+        }*/
 
         type.HasPhase2Initialized = true;
     }
@@ -351,18 +347,18 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         // it prevents us from loading in interfaces that we don't care about
         // (i.e. interfaces whose only connection to types that we *do* care about
         // is the fact that they're colon-specified by a class that we care about)
-        if (type.RoslynSymbol.TypeKind is TypeKind.Interface)
+        //if (type.RoslynSymbol.TypeKind is TypeKind.Interface)
+        //{
+        foreach (var roslynInterface in type.RoslynSymbol.Interfaces)
         {
-            foreach (var roslynInterface in type.RoslynSymbol.Interfaces)
-            {
-                var @interface = GetOrCreateType(
-                    roslynInterface,
-                    null,
-                    AnalysisPhase.TypeInitializationPhase2,
-                    context);
-                type.ColonSpecifiedDirectInterfaces.Add(@interface);
-            }
+            var @interface = GetOrCreateType(
+                roslynInterface,
+                null,
+                AnalysisPhase.TypeInitializationPhase2,
+                context);
+            type.ColonSpecifiedDirectInterfaces.Add(@interface);
         }
+        //}
 
         //type.HasInitializedBaseTypesAndInterfaces = true;
     }
