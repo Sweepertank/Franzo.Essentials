@@ -103,7 +103,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             writer.Write(type.ContainingType!.RoslynSymbol.ToFullyQualifiedDisplayString());
             writer.Write(">");
         }
-        else if (type.RoslynSymbol.TypeKind.IsClassOrStruct())
+        /*else if (type.RoslynSymbol.TypeKind.IsClassOrStruct())
         {
             if (type.AttributeSpecifiedDirectInterfaces.Count > 0)
             {
@@ -117,7 +117,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                     }
                 }
             }
-        }
+        }*/
 
         writer.WriteLine();
         writer.WriteBracedSectionStart();
@@ -174,7 +174,6 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             writer.Write(" { get; }");
             writer.WriteLine();
         }
-
         foreach (var @interface in type.InterfacesInheriting)
         {
             foreach (var feature in @interface.DeclaredFeatures)
@@ -184,8 +183,8 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                         context.Compilation)
                      || feature.RoslynSymbol.DeclaredAccessibility is Accessibility.Protected
                      || (feature.RoslynSymbol.DeclaredAccessibility is Accessibility.ProtectedAndInternal
-                          && feature.RoslynSymbol.ContainingAssembly.GivesAccessTo(
-                            type.RoslynSymbol.ContainingAssembly)))
+                         && feature.RoslynSymbol.ContainingAssembly.GivesAccessTo(
+                                type.RoslynSymbol.ContainingAssembly)))
                     || feature.RoslynSymbol is IMethodSymbol
                     {
                         MethodKind: MethodKind.PropertyGet
@@ -285,7 +284,6 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         IndentedTextWriter writer,
         Context context)
     {
-        var x = type.InterfacesInheriting.ToArray();
         foreach (var @interface in type.InterfacesInheriting)
         {
             if (@interface.DataClass is null) continue;

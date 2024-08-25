@@ -199,11 +199,23 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                 invalid = true;
             }
 
-            if (typeArgument is not null && typeArgument.TypeKind is not TypeKind.Interface)
+            if (typeArgument is not null)
             {
-                context.ReportDiagnostic(
-                    Diagnostic.Create(DiagnosticDescriptors.Dummy, attribute.Location()));
-                invalid = true;
+                if (typeArgument.TypeKind is not TypeKind.Interface)
+                {
+                    context.ReportDiagnostic(
+                        Diagnostic.Create(DiagnosticDescriptors.Dummy, attribute.Location()));
+                    invalid = true;
+                }
+
+                if (!type.RoslynSymbol.Interfaces.Contains(
+                    typeArgument,
+                    SymbolEqualityComparer.Default))
+                {
+                    context.ReportDiagnostic(
+                        Diagnostic.Create(DiagnosticDescriptors.Dummy, attribute.Location()));
+                    invalid = true;
+                }
             }
 
             if (invalid) continue;
@@ -213,6 +225,16 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                 null,
                 AnalysisPhase.TypeInitializationPhase2,
                 context);
+
+            if (type.AttributeSpecifiedDirectInterfaces.Contains(@interface))
+            {
+                context.ReportDiagnostic(
+                    Diagnostic.Create(DiagnosticDescriptors.Dummy, attribute.Location()));
+                invalid = true;
+            }
+
+            if (invalid) continue;
+
             type.AttributeSpecifiedDirectInterfaces.Add(@interface);
         }
 
@@ -257,6 +279,14 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                     Diagnostic.Create(DiagnosticDescriptors.Dummy, attribute.Location()));
                 invalid = true;
             }
+            else if (!type.RoslynSymbol.Interfaces.Contains(
+                boundType,
+                SymbolEqualityComparer.Default))
+            {
+                context.ReportDiagnostic(
+                    Diagnostic.Create(DiagnosticDescriptors.Dummy, attribute.Location()));
+                invalid = true;
+            }
             else
             {
                 roslynInterface = (INamedTypeSymbol)boundType;
@@ -283,6 +313,16 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                 null,
                 AnalysisPhase.TypeInitializationPhase2,
                 context);
+
+            if (type.AttributeSpecifiedDirectInterfaces.Contains(@interface))
+            {
+                context.ReportDiagnostic(
+                    Diagnostic.Create(DiagnosticDescriptors.Dummy, attribute.Location()));
+                invalid = true;
+            }
+
+            if (invalid) continue;
+
             type.AttributeSpecifiedDirectInterfaces.Add(@interface);
         }
 

@@ -24,7 +24,7 @@ public partial interface IDataful
 
 [InheritInterface<IDataless>]
 [InheritInterface<IDataful>]
-public partial class Yorp
+public partial class Yorp : IDataless, IDataful
 {
     public Yorp()
     {

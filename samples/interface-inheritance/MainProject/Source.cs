@@ -19,7 +19,7 @@ public partial interface IBb : IAa
 }
 
 [InheritInterface<IBb>]
-public partial class Cc
+public partial class Cc : IBb
 {
     public Cc()
     {
