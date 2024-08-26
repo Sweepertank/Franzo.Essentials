@@ -78,8 +78,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
         InitializeTypeBaseTypesAndColonSpecifiedInterfaces(type, context);
 
-        var interfaceDataAttribute = type.RoslynSymbol.InterfaceDataAttribute();
-        if (interfaceDataAttribute is not null)
+        if (type.RoslynSymbol.Name == InterfaceDataClassName)
         {
             var invalid = false;
 
@@ -88,7 +87,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                 context.ReportDiagnostic(
                     Diagnostic.Create(
                         DiagnosticDescriptors.Dummy,
-                        interfaceDataAttribute.Location()));
+                        type.RoslynSymbol.Locations.First()));
                 invalid = true;
             }
 
@@ -99,7 +98,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                 context.ReportDiagnostic(
                     Diagnostic.Create(
                         DiagnosticDescriptors.Dummy,
-                        interfaceDataAttribute.Location()));
+                        type.RoslynSymbol.Locations.First()));
                 invalid = true;
             }
 
@@ -108,7 +107,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                 context.ReportDiagnostic(
                     Diagnostic.Create(
                         DiagnosticDescriptors.Dummy,
-                        interfaceDataAttribute.Location()));
+                        type.RoslynSymbol.Locations.First()));
                 invalid = true;
             }
 
@@ -117,7 +116,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                 context.ReportDiagnostic(
                     Diagnostic.Create(
                         DiagnosticDescriptors.Dummy,
-                        interfaceDataAttribute.Location()));
+                        type.RoslynSymbol.Locations.First()));
                 invalid = true;
             }
 
@@ -126,7 +125,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                 context.ReportDiagnostic(
                     Diagnostic.Create(
                         DiagnosticDescriptors.Dummy,
-                        interfaceDataAttribute.Location()));
+                        type.RoslynSymbol.Locations.First()));
                 invalid = true;
             }
 
@@ -142,7 +141,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                 context.ReportDiagnostic(
                     Diagnostic.Create(
                         DiagnosticDescriptors.Dummy,
-                        interfaceDataAttribute.Location()));
+                        type.RoslynSymbol.Locations.First()));
                 invalid = true;
             }
 
@@ -152,7 +151,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                 context.ReportDiagnostic(
                     Diagnostic.Create(
                         DiagnosticDescriptors.Dummy,
-                        interfaceDataAttribute.Location()));
+                        type.RoslynSymbol.Locations.First()));
                 invalid = true;
             }
 
@@ -526,7 +525,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             case AnalysisPhase.TypeInitializationPhase2:
                 if ((!roslynType.ContainingAssembly.CorrectEquals(context.Compilation.Assembly)
                      && !isADataClassFromMetadata)
-                    || roslynType.IsConstructedGenericType())
+                    || roslynType.IsConstructedGenericTypeOrWithinConstructedGenericType())
                 {
                     InitializeTypeBaseTypesAndColonSpecifiedInterfaces(type, context);
 
@@ -534,7 +533,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                     {
                         var roslynDataClass = type.RoslynSymbol
                             .GetTypeMembers()
-                            .FirstOrDefault(t => t.HasAttribute<InterfaceDataAttribute>());
+                            .FirstOrDefault(t => t.Name == InterfaceDataClassName);
                         if (roslynDataClass is not null)
                         {
                             var dataClass = CreateType(

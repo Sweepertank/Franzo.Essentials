@@ -344,7 +344,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         writer.Write("private ");
         writer.Write(@interface.RoslynSymbol.ToFullyQualifiedDisplayString());
         writer.Write(" As");
-        writer.Write(@interface.RoslynSymbol.Name.WithoutInterfaceI());
+        writer.Write(@interface.RoslynSymbol.MemberifiedName());
         writer.Write("()");
         writer.WriteLine();
         writer.WriteBracedSectionStart();
@@ -461,7 +461,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         InternalTypeSymbol @interface,
         IndentedTextWriter writer)
     {
-        writer.Write(@interface.RoslynSymbol.Name.WithoutInterfaceI());
+        writer.Write(@interface.RoslynSymbol.MemberifiedName());
         writer.Write("Data");
     }
 
@@ -470,7 +470,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         IndentedTextWriter writer)
     {
         writer.Write("Construct");
-        writer.Write(@interface.RoslynSymbol.Name.WithoutInterfaceI());
+        writer.Write(@interface.RoslynSymbol.MemberifiedName());
     }
 
     private static void EmitRealDataFieldName(

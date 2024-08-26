@@ -8,4 +8,10 @@ public static class NamedTypeSymbolExtensions
     {
         return self.IsGenericType && !self.CorrectEquals(self.ConstructedFrom);
     }
+
+    public static bool IsConstructedGenericTypeOrWithinConstructedGenericType(this INamedTypeSymbol self)
+    {
+        return self.IsConstructedGenericType()
+            || (self.ContainingType is not null && self.ContainingType.IsConstructedGenericTypeOrWithinConstructedGenericType());
+    }
 }

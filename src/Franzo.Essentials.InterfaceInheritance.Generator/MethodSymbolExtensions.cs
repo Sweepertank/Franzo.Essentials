@@ -1,6 +1,6 @@
 using Microsoft.CodeAnalysis;
 
-namespace Franzo.Essentials;
+namespace Franzo.Essentials.InterfaceInheritance.Generator;
 
 internal static class MethodSymbolExtensions
 {

@@ -13,8 +13,8 @@ public static class SymbolExtensions
             SymbolDisplayMiscellaneousOptions.IncludeNullableReferenceTypeModifier);
 
     // Adapted from CSharpShortErrorMessageFormat
-    // in https://github.com/dotnet/roslyn/src/Compilers/Core/Portable/SymbolDisplay/SymbolDisplayFormat.cs
-    private static SymbolDisplayFormat SimpleFormat = new SymbolDisplayFormat(
+    // in https://github.com/dotnet/roslyn/blob/main/src/Compilers/Core/Portable/SymbolDisplay/SymbolDisplayFormat.cs
+    private static SymbolDisplayFormat SimpleFormat = new(
         globalNamespaceStyle: SymbolDisplayGlobalNamespaceStyle.OmittedAsContaining,
         typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameOnly,
         propertyStyle: SymbolDisplayPropertyStyle.NameOnly,
