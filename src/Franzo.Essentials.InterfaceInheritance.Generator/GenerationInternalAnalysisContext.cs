@@ -13,7 +13,7 @@ internal class GenerationInternalAnalysisContext : InternalAnalysisContext
         get => InnerContext.Compilation;
     }
 
-    public override ImmutableArray<INamedTypeSymbol> PossiblyRelevantTopLevelRoslynTypes
+    public override ImmutableHashSet<INamedTypeSymbol> PossiblyRelevantTopLevelRoslynTypes
     {
         get => InnerContext.PossiblyRelevantTopLevelRoslynTypes;
     }

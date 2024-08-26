@@ -1,6 +1,4 @@
-﻿using Franzo.Essentials.InterfaceInheritance;
-
-namespace ReferencedProject;
+﻿namespace ReferencedProject;
 
 public partial interface IDataless
 {
@@ -15,7 +13,6 @@ public partial interface IDataful
     {
     }
 
-    [InterfaceData]
     public partial class Data_
     {
         public int DatafulProperty { get; set; }

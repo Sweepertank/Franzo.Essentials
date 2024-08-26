@@ -56,7 +56,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
     {
         var context = new Context(
             (CSharpCompilation)source.Item1,
-            source.Item2,
+            source.Item2.ToImmutableHashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default),
             sourceProductionContext);
 
         Analyze(new GenerationInternalAnalysisContext(context));

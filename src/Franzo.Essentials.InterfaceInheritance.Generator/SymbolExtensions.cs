@@ -47,20 +47,20 @@ internal static class SymbolExtensions
             || self.HasGenericAttribute(typeof(InheritInterfaceAttribute<>));
     }*/
 
-    public static bool HasInterfaceDataAttribute(this ISymbol self)
+    /*public static bool HasInterfaceDataAttribute(this ISymbol self)
     {
         return self.HasAttribute<InterfaceDataAttribute>();
-    }
+    }*/
 
     public static bool HasOverrideAttribute(this ISymbol self)
     {
         return self.HasAttribute<OverrideAttribute>();
     }
 
-    public static AttributeData? InterfaceDataAttribute(this ISymbol self)
+    /*public static AttributeData? InterfaceDataAttribute(this ISymbol self)
     {
         return self.GetAttributes<InterfaceDataAttribute>().FirstOrDefault();
-    }
+    }*/
 
     public static bool IsAccessibleFromType(
         this ISymbol self,
