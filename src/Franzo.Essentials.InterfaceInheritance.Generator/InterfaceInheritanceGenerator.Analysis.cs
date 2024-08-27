@@ -414,6 +414,10 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             {
                 if (feature.RoslynSymbol.HasOverrideAttribute())
                 {
+                    // @todo: check if the feature is sealed or not, and if it isn't,
+                    // report an error
+                    // but there's no consistent way to check this (interface members outside of compiling assembly
+                    // always have IsVirtual = false, even if they have the 'sealed' keyword)
                     feature.HasOverrideAttribute = true;
                 }
             }

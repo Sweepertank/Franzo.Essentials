@@ -12,6 +12,14 @@ public static class SymbolExtensions
         SymbolDisplayFormat.FullyQualifiedFormat.AddMiscellaneousOptions(
             SymbolDisplayMiscellaneousOptions.IncludeNullableReferenceTypeModifier);
 
+    private static SymbolDisplayFormat NamespaceQualifiedFormat = new(
+        globalNamespaceStyle: SymbolDisplayGlobalNamespaceStyle.Omitted,
+        typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces,
+        genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters,
+        miscellaneousOptions:
+            SymbolDisplayMiscellaneousOptions.EscapeKeywordIdentifiers |
+            SymbolDisplayMiscellaneousOptions.UseSpecialTypes);
+
     // Adapted from CSharpShortErrorMessageFormat
     // in https://github.com/dotnet/roslyn/blob/main/src/Compilers/Core/Portable/SymbolDisplay/SymbolDisplayFormat.cs
     private static SymbolDisplayFormat SimpleFormat = new(
@@ -26,6 +34,22 @@ public static class SymbolExtensions
         parameterOptions:
             SymbolDisplayParameterOptions.IncludeParamsRefOut |
             SymbolDisplayParameterOptions.IncludeType,
+        miscellaneousOptions:
+            SymbolDisplayMiscellaneousOptions.EscapeKeywordIdentifiers |
+            SymbolDisplayMiscellaneousOptions.UseSpecialTypes |
+            SymbolDisplayMiscellaneousOptions.UseAsterisksInMultiDimensionalArrays |
+            SymbolDisplayMiscellaneousOptions.UseErrorTypeSymbolName |
+            SymbolDisplayMiscellaneousOptions.IncludeNullableReferenceTypeModifier);
+
+    private static SymbolDisplayFormat VerbatimizedFormat = new(
+        globalNamespaceStyle: SymbolDisplayGlobalNamespaceStyle.OmittedAsContaining,
+        typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypes,
+        propertyStyle: SymbolDisplayPropertyStyle.NameOnly,
+        genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters,
+        memberOptions:
+            SymbolDisplayMemberOptions.IncludeParameters |
+            SymbolDisplayMemberOptions.IncludeContainingType |
+            SymbolDisplayMemberOptions.IncludeExplicitInterface,
         miscellaneousOptions:
             SymbolDisplayMiscellaneousOptions.EscapeKeywordIdentifiers |
             SymbolDisplayMiscellaneousOptions.UseSpecialTypes |
@@ -91,9 +115,11 @@ public static class SymbolExtensions
         return self.ToDisplayString(FullyQualifiedWithNullableReferenceTypeAnnotationsFormat);
     }
 
-    public static string ToCSharpShortErrorMessageString(this ISymbol self)
+    public static string ToNamespaceQualifiedFileSystemDisplayString(this ISymbol self)
     {
-        return self.ToDisplayString(SymbolDisplayFormat.CSharpShortErrorMessageFormat);
+        return self.ToDisplayString(NamespaceQualifiedFormat)
+            .Replace('<', '{')
+            .Replace('>', '}');
     }
 
     public static string ToSimpleDisplayString(this ISymbol self)
@@ -101,10 +127,14 @@ public static class SymbolExtensions
         return self.ToDisplayString(SimpleFormat);
     }
 
+    public static string VerbatimizedName(this ISymbol self)
+    {
+        return self.ToDisplayString(VerbatimizedFormat);
+    }
+
     public static void WriteVerbatimizedName(this ISymbol self, TextWriter writer)
     {
-        writer.Write("@");
-        writer.Write(self.Name);
+        writer.Write(self.VerbatimizedName());
     }
 
     // @todo: this should return T eventually

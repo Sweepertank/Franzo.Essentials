@@ -1,3 +1,4 @@
+using System.Collections;
 using Franzo.Essentials;
 
 namespace MainProject;
@@ -12,10 +13,10 @@ public partial interface IAa
     [Override]
     public string ToString();
 
-    public void Shoot();
+    public void Shoot(int f, int @if);
 }
 
-public partial interface IBb : IAa
+public partial interface IBb : IAa, IEnumerable<int>
 {
     int IAa.Yupple
     {
@@ -27,7 +28,17 @@ public partial interface IBb : IAa
         return "asd";
     }
 
-    void IAa.Shoot()
+    IEnumerator<int> IEnumerable<int>.GetEnumerator()
+    {
+        return null!;
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return null!;
+    }
+
+    void IAa.Shoot(int f, int @if)
     {
     }
 }
