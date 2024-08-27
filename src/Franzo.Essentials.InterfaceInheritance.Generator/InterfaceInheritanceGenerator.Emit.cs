@@ -232,17 +232,27 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                             IsConst: false,
                             IsReadOnly: false
                         }
-                        // @todo: once partial properties are in,
-                        // we should change this so that we *do* emit inheritances for public abstract properties and methods,
-                        // but just mark them them as partial
-                        // (ideally we would do so for events too, but it doesn't look like partial events are coming any time soon)
-                        || (feature.RoslynSymbol.DeclaredAccessibility is Accessibility.Public
-                            && feature.RoslynSymbol.IsAbstract)
                         || feature.RoslynSymbol.Name == type.RoslynSymbol.Name)
                     {
                         continue;
                     }
 
+                    // @todo: once partial properties are in,
+                    // we should change this so that we *do* emit inheritances for public abstract properties and methods,
+                    // but just mark them them as partial
+                    // (ideally we would do so for events too, but it doesn't look like partial events are coming any time soon)
+                    // note: above comment is old and probably confusing
+                    if (feature.RoslynSymbol.DeclaredAccessibility is Accessibility.Public
+                        && feature.RoslynSymbol.IsAbstract
+                        && type.DirectInterfaces.All(
+                            i => i.RoslynSymbol.FindImplementationForInterfaceMember(feature.RoslynSymbol) is null))
+                    {
+                        continue;
+                    }
+
+                    // @perf: checking directinterfaces is redundant here
+                    // now that classes specify their interface lists before generation
+                    // other places probably have similar redundancies too
                     if (feature.TypesDeclaringShadowingFeatures.Any(
                         shadowingType => type.RoslynSymbol.IsAssignableTo(
                                 shadowingType.RoslynSymbol,
@@ -798,7 +808,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
             if (parameter.HasExplicitDefaultValue && !isForUnsafeAccessor)
             {
-                writer.Write("= ");
+                writer.Write(" = ");
                 EmitConstant(parameter.ExplicitDefaultValue, parameter.Type, writer);
             }
 

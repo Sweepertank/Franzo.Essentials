@@ -1,3 +1,5 @@
+using Franzo.Essentials;
+
 namespace MainProject;
 
 public partial interface IAa
@@ -6,17 +8,31 @@ public partial interface IAa
     {
         get => 0;
     }
+
+    [Override]
+    public string ToString();
+
+    public void Shoot();
 }
 
 public partial interface IBb : IAa
 {
-    public new int Yupple
+    int IAa.Yupple
     {
         get => 1;
     }
+
+    string IAa.ToString()
+    {
+        return "asd";
+    }
+
+    void IAa.Shoot()
+    {
+    }
 }
 
-public partial class Cc : IBb
+public partial record class Cc : IBb
 {
     public Cc()
     {

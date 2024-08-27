@@ -387,7 +387,8 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                 {
                     if (feature.RoslynSymbol.MemberCollidesWith(
                         interfaceFeature.RoslynSymbol,
-                        context.Compilation))
+                        context.Compilation)
+                        && !feature.RoslynSymbol.IsImplicitlyDeclared)
                     {
                         interfaceFeature.TypesDeclaringShadowingFeatures.Add(type);
                     }

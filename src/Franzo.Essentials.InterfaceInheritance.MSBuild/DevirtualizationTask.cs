@@ -1,6 +1,5 @@
 ﻿using Microsoft.Build.Framework;
 using Mono.Cecil;
-using Mono.Cecil.Cil;
 
 namespace Franzo.Essentials.InterfaceInheritance.MSBuild;
 
@@ -61,17 +60,6 @@ public class DevirtualizationTask : Microsoft.Build.Utilities.Task
 
     private void DevirtualizeMethod(MethodDefinition method)
     {
-        if (method.Body is null)
-        {
-            return;
-        }
-
-        foreach (var instruction in method.Body.Instructions)
-        {
-            if (instruction.OpCode == OpCodes.Callvirt)
-            {
-                instruction.OpCode = OpCodes.Call;
-            }
-        }
+        method.Attributes &= ~(MethodAttributes.Final | MethodAttributes.NewSlot | MethodAttributes.Virtual);
     }
 }
