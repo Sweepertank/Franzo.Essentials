@@ -1,59 +1,7 @@
-using System.Collections;
-using Franzo.Essentials;
-
 namespace MainProject;
 
-public partial interface IAa
+public partial interface IGeneric<T>
 {
-    public int Yupple
-    {
-        get => 0;
-    }
-
-    [Override]
-    public string ToString();
-
-    public void Shoot(int f, int @if);
-}
-
-public partial interface IBb : IAa, IEnumerable<int>
-{
-    int IAa.Yupple
-    {
-        get => 1;
-    }
-
-    string IAa.ToString()
-    {
-        return "asd";
-    }
-
-    IEnumerator<int> IEnumerable<int>.GetEnumerator()
-    {
-        return null!;
-    }
-
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return null!;
-    }
-
-    void IAa.Shoot(int f, int @if)
-    {
-    }
-}
-
-public partial record class Cc : IBb
-{
-    public Cc()
-    {
-        Console.WriteLine(Yupple);
-    }
-}
-
-/*public partial interface IGeneric<T>
-{
-    [InterfaceData]
     public partial class Data_
     {
         public int Goofy { get; }
@@ -66,26 +14,21 @@ public partial record class Cc : IBb
 
 public partial interface IDerivedGeneric<T> : IGeneric<T>
 {
-    [InterfaceData]
     public new partial class Data_
     {
         public int Goofy2 { get; }
     }
 }
 
-public class Blurb
+public partial class Blurb : IDerivedGeneric<int>
 {
     public Blurb()
     {
-
-    }
-
-    public Blurb(int f)
-    {
+        DerivedGenericData = ConstructDerivedGeneric();
     }
 }
 
-[InheritInterface("IDerivedGeneric<T>")]
+/*[InheritInterface("IDerivedGeneric<T>")]
 public partial class GenericClass<T> : Blurb
 {
 }

@@ -220,12 +220,12 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
         if (type.IsDataClass)
         {
-            writer.Write("public static readonly global::System.Reflection.ConstructorInfo ");
-            writer.Write(GeneratedConstructorPropertyName);
-            writer.Write(" = typeof(");
-            writer.Write(type.RoslynSymbol.ToDisplayString());
-            writer.Write(").GetConstructors()[0];");
-            writer.WriteLine();
+            EmitUnsafeAccessorForMethod(
+                type.ConstructorIfDataClass!.RoslynSymbol,
+                type.RoslynSymbol,
+                writer,
+                declaredName: GeneratedConstructorProxyName,
+                makePublic: true);
 
             foreach (var @event in type.DeclaredEvents)
             {
@@ -528,15 +528,12 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                 }
             }
 
-            // @todo: remove string interpolations if needed for perf
-
-            // @todo: create delegate and invoke that instead
             writer.Write(@interface.RoslynSymbol.ToFullyQualifiedDisplayString());
             writer.Write(".");
             writer.Write(InterfaceDataClassName);
             writer.Write(".");
-            writer.Write(GeneratedConstructorPropertyName);
-            writer.Write(".Invoke(");
+            writer.Write(GeneratedConstructorProxyName);
+            writer.Write("(");
             if (type.IsDataClass)
             {
                 writer.Write("((");
@@ -550,11 +547,16 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             {
                 EmitRealDataFieldName(@interface, writer);
             }
-            writer.Write(", new object?[] { ");
-            EmitUnparenthesizedArgumentListFromParameters(
-                @interface.DataClass.ConstructorIfDataClass.RoslynSymbol.Parameters,
-                writer);
-            writer.Write(" });");
+
+            if (@interface.DataClass.ConstructorIfDataClass.RoslynSymbol.Parameters.Length > 0)
+            {
+                writer.Write(", ");
+                EmitUnparenthesizedArgumentListFromParameters(
+                    @interface.DataClass.ConstructorIfDataClass.RoslynSymbol.Parameters,
+                    writer);
+            }
+
+            writer.Write(");");
             writer.WriteLine();
 
             writer.WriteLine($"return null!;");
@@ -1309,7 +1311,8 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         INamedTypeSymbol withinType,
         IndentedTextWriter writer,
         Context context,
-        bool isForUnsafeAccessor = false)
+        bool isForUnsafeAccessor = false,
+        string? declaredName = null)
     {
         writer.Write(method.ReturnType.ToFullyQualifiedDisplayString());
         writer.Write(" ");
@@ -1319,7 +1322,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         }
         else
         {*/
-        writer.Write(method.Name);
+        writer.Write(declaredName ?? method.Name);
         //}
         EmitTypeParameterList(method.TypeParameters, writer);
         writer.Write("(");
@@ -1901,7 +1904,9 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
     private static void EmitUnsafeAccessorForMethod(
         IMethodSymbol method,
         INamedTypeSymbol declaringType,
-        IndentedTextWriter writer)
+        IndentedTextWriter writer,
+        string? declaredName = null,
+        bool makePublic = false)
     {
         writer.Write("[global::System.Runtime.CompilerServices.UnsafeAccessorAttribute(global::System.Runtime.CompilerServices.UnsafeAccessorKind.");
         if (method.IsStatic)
@@ -1912,6 +1917,10 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         writer.Write(method.Name);
         writer.Write("\")]");
         writer.WriteLine();
+        if (makePublic)
+        {
+            writer.Write("public ");
+        }
         writer.Write("extern static ");
         EmitMethodCoreSignature(
             method,
@@ -1919,7 +1928,8 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             null!,
             writer,
             null!,
-            isForUnsafeAccessor: true);
+            isForUnsafeAccessor: true,
+            declaredName: declaredName);
         writer.Write(";");
         writer.WriteLine();
     }
