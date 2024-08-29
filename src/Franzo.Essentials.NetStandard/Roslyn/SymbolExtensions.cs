@@ -172,4 +172,22 @@ public static class SymbolExtensions
     {
         return self.GetGenericAttributes(attributeGenericTypeDefinition).Any();
     }
+
+    public static IReadOnlyList<ISymbol> GetExplicitInterfaceImplementations(this ISymbol member)
+    {
+        return member switch
+        {
+            IMethodSymbol method => method.ExplicitInterfaceImplementations,
+            IPropertySymbol property => property.ExplicitInterfaceImplementations,
+            IEventSymbol @event => @event.ExplicitInterfaceImplementations,
+            _ => throw new ShouldNeverBeThrownException()
+        };
+    }
+
+    public static bool IsExplicitImplementationFor(this ISymbol member, ISymbol interfaceMember)
+    {
+        return member
+            .GetExplicitInterfaceImplementations()
+            .Contains(interfaceMember, SymbolEqualityComparer.Default);
+    }
 }

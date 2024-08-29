@@ -10,6 +10,8 @@ public partial interface IAa
         get => 0;
     }
 
+    public int Gupple { get; }
+
     [Override]
     public string ToString();
 
@@ -45,6 +47,8 @@ public partial interface IBb : IAa, IEnumerable<int>
 
 public partial record class Cc : IBb
 {
+    public int Gupple { get; }
+
     public Cc()
     {
         Console.WriteLine(Yupple);

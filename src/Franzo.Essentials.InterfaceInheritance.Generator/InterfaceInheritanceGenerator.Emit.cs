@@ -306,10 +306,12 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                     // but just mark them them as partial
                     // (ideally we would do so for events too, but it doesn't look like partial events are coming any time soon)
                     // note: above comment is old and probably confusing
+                    var featureImpl = type.RoslynSymbol.FindImplementationForInterfaceMember(feature.RoslynSymbol);
                     if (feature.RoslynSymbol.DeclaredAccessibility is Accessibility.Public
                         && feature.RoslynSymbol.IsAbstract
                         && type.DirectInterfaces.All(
-                            i => i.RoslynSymbol.FindImplementationForInterfaceMember(feature.RoslynSymbol) is null))
+                            i => i.RoslynSymbol.FindImplementationForInterfaceMember(feature.RoslynSymbol) is null)
+                        && (featureImpl is null || !featureImpl.IsExplicitImplementationFor(feature.RoslynSymbol)))
                     {
                         continue;
                     }
@@ -926,7 +928,6 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         EmitAttributes(feature.RoslynSymbol, withinType, writer, context, true);
         if (feature is not InternalFieldSymbol
             && feature.RoslynSymbol.DeclaredAccessibility is Accessibility.Public
-            && (feature.RoslynSymbol.IsVirtual || feature.RoslynSymbol.IsAbstract)
             && !feature.HasOverrideAttribute)
         {
             writer.Write("[");
