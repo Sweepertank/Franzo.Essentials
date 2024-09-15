@@ -1,3 +1,4 @@
+using System.Text;
 using Microsoft.CodeAnalysis;
 
 namespace Franzo.Essentials.InterfaceInheritance.Generator;
@@ -6,7 +7,7 @@ internal static class NamedTypeSymbolExtensions
 {
     // Adapted from CSharpShortErrorMessageFormat
     // in https://github.com/dotnet/roslyn/blob/main/src/Compilers/Core/Portable/SymbolDisplay/SymbolDisplayFormat.cs
-    public static SymbolDisplayFormat TypeQualifiedFormat { get; } = new(
+    public static readonly SymbolDisplayFormat TypeQualifiedFormat = new(
         globalNamespaceStyle: SymbolDisplayGlobalNamespaceStyle.OmittedAsContaining,
         typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypes,
         propertyStyle: SymbolDisplayPropertyStyle.NameOnly,
@@ -25,6 +26,10 @@ internal static class NamedTypeSymbolExtensions
             SymbolDisplayMiscellaneousOptions.UseErrorTypeSymbolName |
             SymbolDisplayMiscellaneousOptions.IncludeNullableReferenceTypeModifier);
 
+    public static readonly SymbolDisplayFormat TypeQualifiedWithTypeParametersFormat =
+        TypeQualifiedFormat.WithGenericsOptions(
+            SymbolDisplayGenericsOptions.IncludeTypeParameters);
+
     public static bool IsCompilerGeneratedAttributeType(this INamedTypeSymbol self)
     {
         return self.ToDisplayString()
@@ -34,21 +39,42 @@ internal static class NamedTypeSymbolExtensions
 
     public static string MemberifiedName(this INamedTypeSymbol self)
     {
-        var s = self.ToDisplayString(TypeQualifiedFormat);
-        var indexOfLastDot = s.LastIndexOf('.');
-
-        var simpleNameStartIndex = 0;
-        if (indexOfLastDot >= 0)
+        string Mangle(string str)
         {
-            simpleNameStartIndex = indexOfLastDot + 1;
+            return str.Replace('.', '_')
+                .Replace("<", "__")
+                .Replace(">", "__")
+                .Replace(", ", "_");
         }
 
-        s = s.Replace('.', '_');
+        var s = self.Name.WithoutInterfaceI();
 
-        if (simpleNameStartIndex < s.Length)
+        if (self.TypeArguments.Length > 0)
         {
-            return s.Substring(0, simpleNameStartIndex)
-                + s.Substring(simpleNameStartIndex, s.Length - simpleNameStartIndex).WithoutInterfaceI();
+            var sb = new StringBuilder();
+            sb.Append("__");
+
+            foreach ((var i, var typeArgument) in self.TypeArguments.IndicesAndItems())
+            {
+                sb.Append(
+                    Mangle(typeArgument.ToDisplayString(TypeQualifiedWithTypeParametersFormat)));
+
+                if (i != self.TypeArguments.Length - 1)
+                {
+                    sb.Append("_");
+                }
+            }
+
+            sb.Append("__");
+
+            s += sb.ToString();
+        }
+
+        if (self.ContainingType is not null)
+        {
+            s = Mangle(self.ContainingType.ToDisplayString(TypeQualifiedWithTypeParametersFormat))
+                + "_"
+                + s;
         }
 
         return s;

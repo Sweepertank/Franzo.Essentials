@@ -3,6 +3,33 @@ using Franzo.Essentials;
 
 namespace MainProject;
 
+public class Foo
+{
+    public class Bar
+    {
+
+    }
+}
+
+public partial interface IOuter<F>
+{
+    public partial interface IGeneric<T, U>
+    {
+        public partial class Data_
+        {
+        }
+    }
+}
+
+public partial class Goop<T, U> : IOuter<int>.IGeneric<T, U>
+{
+    public Goop()
+    {
+        IOuter__int___Generic__T_U__Data = ConstructIOuter__int___Generic__T_U__();
+        //Generic__T__Data = ConstructGeneric__T__();
+    }
+}
+
 public partial interface IAa
 {
     public int Yupple
