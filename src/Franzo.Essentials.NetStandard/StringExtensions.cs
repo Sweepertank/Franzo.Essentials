@@ -58,4 +58,24 @@ public static class StringExtensions
 
         return sb.ToString();
     }
+
+    public static string Capitalize(this string self)
+    {
+        return self switch
+        {
+            "" => "",
+            _ => char.ToUpper(self[0]) + self.Substring(1, self.Length - 1)
+        };
+    }
+
+    public static (string, string) SliceAfterLast(this string self, char character)
+    {
+        int index = self.LastIndexOf(character);
+        if (index < 0)
+        {
+            return (self, "");
+        }
+
+        return (self.Substring(0, index + 1), self.Substring(index + 1, self.Length - index + 1));
+    }
 }
