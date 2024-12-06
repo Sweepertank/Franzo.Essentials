@@ -1049,7 +1049,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
             writer.WriteBracedSectionStart();
 
-            if (property.RoslynSymbol.IsProtectedOrProtectedAndOrInternal())
+            if (property.RoslynSymbol.SetMethod.IsProtectedOrProtectedAndOrInternal())
             {
                 EmitUnsafeSetterForProperty(property.RoslynSymbol, declaringType, writer);
                 EmitUnsafeSetterInvocationForProperty(property.RoslynSymbol, writer, "this");
@@ -1493,7 +1493,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
             writer.WriteBracedSectionStart();
 
-            if (property.IsPublicOrInternal())
+            if (property.SetMethod.IsPublicOrInternal())
             {
                 writer.Write(GeneratedInterfaceDataPropertyName);
                 writer.Write(".");

@@ -17,6 +17,7 @@ public partial interface IOuter<F>
     {
         public partial class Data_
         {
+            public int DatafulProperty { get; protected set; }
         }
     }
 }
