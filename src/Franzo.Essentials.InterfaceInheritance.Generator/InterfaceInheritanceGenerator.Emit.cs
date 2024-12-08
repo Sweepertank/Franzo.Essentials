@@ -859,6 +859,13 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                 EmitAttributes(parameter, withinType, writer, context, false);
             }
 
+            var refKindModifier = parameter.RefKind.ToCSharpString();
+            if (refKindModifier is not null)
+            {
+                writer.Write(refKindModifier);
+                writer.Write(" ");
+            }
+
             writer.Write(parameter.Type.ToFullyQualifiedDisplayString());
             writer.Write(" ");
 

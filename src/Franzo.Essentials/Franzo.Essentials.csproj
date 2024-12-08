@@ -9,11 +9,17 @@
     <NoWarn>NU5100</NoWarn>
     <!-- Suppress NuGet warning NU5128. -->
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Franzo.Essentials.NetStandard\Franzo.Essentials.NetStandard.csproj" />
+    <ProjectReference Include="..\Franzo.Essentials.InterfaceInheritance.Generator\Franzo.Essentials.InterfaceInheritance.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\Franzo.Essentials.InterfaceInheritance.MSBuild\Franzo.Essentials.InterfaceInheritance.MSBuild.csproj" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="OneOf" Version="3.0.271" />
   </ItemGroup>
 
   <!-- This is the target we defined above. It's purpose is to add all of our PackageReference and ProjectReference's runtime assets to our package output.  -->
