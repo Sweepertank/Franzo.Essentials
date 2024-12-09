@@ -10,7 +10,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/samples/interface-inheritance/MainProject/bin/Debug/net8.0/MainProject.exe",
+            "program": "${workspaceFolder}/samples/interface-inheritance/MainProject/bin/Debug/net9.0/MainProject.exe",
             "args": [],
             "cwd": "${workspaceFolder}/samples/interface-inheritance/MainProject",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
