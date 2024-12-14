@@ -1,7 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using Franzo.Essentials;
 
 namespace Franzo.Essentials.Reflection;
 
@@ -94,7 +93,7 @@ public static class MemberInfoExtensions
         // https://stackoverflow.com/questions/288357/how-does-reflection-tell-me-when-a-property-is-hiding-an-inherited-member-with-t
         if (self.DeclaringType?.BaseType is null)
         {
-            return [];
+            return Array.Empty<MemberInfo>();
         }
 
         return self.DeclaringType.BaseType.GetMember(self.Name);

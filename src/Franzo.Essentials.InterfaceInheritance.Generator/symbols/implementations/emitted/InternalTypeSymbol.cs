@@ -11,9 +11,9 @@ internal class InternalTypeSymbol : InternalSymbol, IInternalTypeSymbol
     public bool HasPhase2Initialized = false;
     //public bool HasInitializedBaseTypesAndInterfaces = false;
     public bool HasPhase1Analyzed = false;
-    public List<InternalTypeSymbol> DeclaredTypes = [];
-    public List<InternalTypeSymbol> ColonSpecifiedDirectInterfaces = [];
-    public List<InternalFeatureSymbol> SourceDeclaredFeatures = [];
+    public List<InternalTypeSymbol> DeclaredTypes = new();
+    public List<InternalTypeSymbol> ColonSpecifiedDirectInterfaces = new();
+    public List<InternalFeatureSymbol> SourceDeclaredFeatures = new();
     public InternalTypeSymbol? DataClass = null;
     public bool IsDataClass = false;
     public InternalMethodSymbol? ConstructorIfDataClass = null;

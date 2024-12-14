@@ -39,7 +39,7 @@ public class NullableAwareType
         if (Type.IsNullableValueType())
         {
             newType = Type.GenericTypeArguments[0];
-            newGenericTypeArgs = [];
+            newGenericTypeArgs = Array.Empty<NullableAwareType>();
         }
 
         return Create(newType, false, newGenericTypeArgs);
