@@ -1,5 +1,3 @@
-using System.Text;
-
 namespace Franzo.Essentials;
 
 public static class StringExtensions
@@ -10,31 +8,13 @@ public static class StringExtensions
         return self is null || self == other;
     }
 
-    public static string Capitalized(this string self)
-    {
-        // https://stackoverflow.com/questions/4135317/make-first-letter-of-a-string-upper-case-with-maximum-performance
-        return self switch
-        {
-            "" => "",
-            _ => string.Concat(self[0].ToString().ToUpper(), self.AsSpan(1))
-        };
-    }
-
-    public static string Uncapitalized(this string self)
+    public static string Uncapitalize(this string self)
     {
         return self switch
         {
             "" => "",
             _ => string.Concat(self[0].ToString().ToLower(), self.AsSpan(1))
         };
-    }
-
-    [Obsolete]
-    public static (string, string) SplitAtLast(this string self, char character)
-    {
-        return (
-            self.RemoveStartingAtLastIndexOf(character),
-            self.RemoveUpToAndIncludingLastIndexOf(character));
     }
 
     [Obsolete]
@@ -85,17 +65,6 @@ public static class StringExtensions
         }
 
         return self.Remove(0, index + 1);
-    }
-
-    public static string Repeat(this string str, int repetitions)
-    {
-        var sb = new StringBuilder(repetitions * str.Length);
-        for (var i = 0; i < repetitions; i++)
-        {
-            sb.Append(str);
-        }
-
-        return sb.ToString();
     }
 
     [Obsolete]

@@ -76,6 +76,6 @@ public static class StringExtensions
             return (self, "");
         }
 
-        return (self.Substring(0, index + 1), self.Substring(index + 1, self.Length - index + 1));
+        return (self.Substring(0, index + 1), self.Substring(index + 1, self.Length - index - 1));
     }
 }
