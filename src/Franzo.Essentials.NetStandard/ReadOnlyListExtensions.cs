@@ -9,4 +9,17 @@ public static class ReadOnlyListExtensions
             yield return (i, self[i]);
         }
     }
+
+    public static int IndexOf<T>(this IReadOnlyList<T> self, T item)
+    {
+        foreach ((var i, var listItem) in self.IndicesAndItems())
+        {
+            if (EqualityComparer<T>.Default.Equals(listItem, item))
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
 }
