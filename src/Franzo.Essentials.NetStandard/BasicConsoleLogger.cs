@@ -4,7 +4,7 @@ namespace Franzo.Essentials;
 
 public class BasicConsoleLogger : ILogger
 {
-    public static readonly NullLogger Instance = new();
+    public static readonly BasicConsoleLogger Instance = new();
 
     public IDisposable? BeginScope<TState>(TState state) where TState : notnull
     {
