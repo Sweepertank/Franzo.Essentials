@@ -27,7 +27,7 @@ public static class SymbolExtensions
         globalNamespaceStyle: SymbolDisplayGlobalNamespaceStyle.OmittedAsContaining,
         typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameOnly,
         propertyStyle: SymbolDisplayPropertyStyle.NameOnly,
-        genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters,
+        genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters | SymbolDisplayGenericsOptions.IncludeVariance,
         memberOptions:
             SymbolDisplayMemberOptions.IncludeParameters |
             SymbolDisplayMemberOptions.IncludeContainingType |
