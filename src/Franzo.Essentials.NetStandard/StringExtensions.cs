@@ -2,7 +2,7 @@ using System.Text;
 
 namespace Franzo.Essentials;
 
-public static class StringExtensions
+public static class NetStandardStringExtensions
 {
     public static string RemoveStartingAtFirst(this string self, char c)
     {
@@ -65,6 +65,15 @@ public static class StringExtensions
         {
             "" => "",
             _ => char.ToUpper(self[0]) + self.Substring(1, self.Length - 1)
+        };
+    }
+
+    public static string Uncapitalize(this string self)
+    {
+        return self switch
+        {
+            "" => "",
+            _ => char.ToLower(self[0]) + self.Substring(1, self.Length - 1)
         };
     }
 

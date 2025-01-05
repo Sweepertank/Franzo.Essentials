@@ -1,20 +1,11 @@
 namespace Franzo.Essentials;
 
-public static class StringExtensions
+public static class StringExtensionsASF
 {
     [Obsolete]
     public static bool IsNullOrEqualTo(this string? self, string other)
     {
         return self is null || self == other;
-    }
-
-    public static string Uncapitalize(this string self)
-    {
-        return self switch
-        {
-            "" => "",
-            _ => string.Concat(self[0].ToString().ToLower(), self.AsSpan(1))
-        };
     }
 
     [Obsolete]
@@ -125,5 +116,15 @@ public static class StringExtensions
         }
 
         return false;
+    }
+
+    public static string[] ParseKebabCase(this string self)
+    {
+        return self.Split('-');
+    }
+
+    public static string KebabToPascalCase(this string self)
+    {
+        return string.Join(null, self.ParseKebabCase().Select(s => s.Capitalize()));
     }
 }
