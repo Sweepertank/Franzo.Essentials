@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace Franzo.Essentials;
 
 public static class StringExtensions
@@ -117,6 +119,32 @@ public static class StringExtensions
 
         return false;
     }*/
+
+    public static bool HasUnpairedSurrogates(this string self)
+    {
+        // https://stackoverflow.com/questions/50761133/how-to-check-for-invalid-utf-8-characters
+
+        for (var i = 0; i < self.Length; i++)
+        {
+            var uc = char.GetUnicodeCategory(self, i);
+
+            if (uc == UnicodeCategory.Surrogate)
+            {
+                // Unpaired surrogate, like  "😵"[0] + "A" or  "😵"[1] + "A"
+                return true;
+            }
+
+            // Correct high-low surrogate, we must skip the low surrogate
+            // (it is correct because otherwise it would have been a 
+            // UnicodeCategory.Surrogate)
+            if (char.IsHighSurrogate(self, i))
+            {
+                i++;
+            }
+        }
+
+        return false;
+    }
 
     public static string[] ParseKebabCase(this string self)
     {
