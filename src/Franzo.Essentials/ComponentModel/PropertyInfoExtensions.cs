@@ -1,5 +1,4 @@
 using System.Reflection;
-using Franzo.Essentials;
 using Franzo.Essentials.Reflection;
 
 namespace Franzo.Essentials.ComponentModel;
@@ -52,14 +51,14 @@ public static class PropertyInfoExtensions
         Type[] addMethodParameterTypes;
         if (self.PropertyType.ImplementsIReadOnlyDictionary_TKey_TValue())
         {
-            addMethodParameterTypes = new Type[] {
+            addMethodParameterTypes = new[] {
                 itemType.GenericTypeArguments[0].Type,
                 itemType.GenericTypeArguments[1].Type
             };
         }
         else
         {
-            addMethodParameterTypes = new Type[] { itemType.Type };
+            addMethodParameterTypes = new[] { itemType.Type };
         }
 
         var addMethod = self.DeclaringType.GetMethod(

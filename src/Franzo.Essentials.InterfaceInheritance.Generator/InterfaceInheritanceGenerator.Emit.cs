@@ -134,7 +134,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         }*/
     }
 
-    internal static void EmitTypeWithNamespaceDeclaration(
+    private static void EmitTypeWithNamespaceDeclaration(
         InternalTypeSymbol type,
         IndentedTextWriter writer,
         Context context)
@@ -646,7 +646,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
     {
         var attributes = symbol.GetAttributes();
         // Note: protected/private protected member types in a interface CAN currently be accessed by implementing classes
-        foreach ((var i, var attribute) in attributes.IndicesAndItems())
+        foreach ((var attribute, var last) in attributes.WithLastFlag())
         {
             if (attribute.AttributeClass is null
                 || attribute.AttributeClass.IsCompilerGeneratedAttributeType()
@@ -670,7 +670,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             }
             else
             {
-                if (i != attributes.Length - 1)
+                if (!last)
                 {
                     writer.Write(" ");
                 }
@@ -684,22 +684,21 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         writer.Write(attribute.AttributeClass!.ToFullyQualifiedDisplayString());
         writer.Write("(");
 
-        foreach ((var i, var argument) in attribute.ConstructorArguments.IndicesAndItems())
+        foreach ((var argument, var last) in attribute.ConstructorArguments.WithLastFlag())
         {
             EmitTypedConstant(argument, writer);
-            if (i != attribute.ConstructorArguments.Length - 1
-                || attribute.NamedArguments.Length > 0)
+            if (!last || attribute.NamedArguments.Length > 0)
             {
                 writer.Write(", ");
             }
         }
 
-        foreach ((var i, var pair) in attribute.NamedArguments.IndicesAndItems())
+        foreach ((var pair, var last) in attribute.NamedArguments.WithLastFlag())
         {
             writer.Write(pair.Key);
             writer.Write(" = ");
             EmitTypedConstant(pair.Value, writer);
-            if (i != attribute.NamedArguments.Length - 1)
+            if (!last)
             {
                 writer.Write(", ");
             }
@@ -749,10 +748,10 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         ImmutableArray<TypedConstant> typedConstants,
         IndentedTextWriter writer)
     {
-        foreach ((var i, var typedConstant) in typedConstants.IndicesAndItems())
+        foreach ((var typedConstant, var last) in typedConstants.WithLastFlag())
         {
             EmitTypedConstant(typedConstant, writer);
-            if (i != typedConstants.Length - 1)
+            if (!last)
             {
                 writer.Write(", ");
             }
@@ -852,7 +851,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         Context context,
         bool isForUnsafeAccessor = false)
     {
-        foreach ((var i, var parameter) in parameters.IndicesAndItems())
+        foreach (((var i, var parameter), var last) in parameters.IndicesAndItems().WithLastFlag())
         {
             if (!isForUnsafeAccessor)
             {
@@ -885,7 +884,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                 EmitConstant(parameter.ExplicitDefaultValue, parameter.Type, writer);
             }
 
-            if (i != parameters.Length - 1)
+            if (!last)
             {
                 writer.Write(", ");
             }
@@ -907,7 +906,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         ImmutableArray<IParameterSymbol> parameters,
         IndentedTextWriter writer)
     {
-        foreach ((var i, var parameter) in parameters.IndicesAndItems())
+        foreach ((var parameter, var last) in parameters.WithLastFlag())
         {
             var refKindModifier = parameter.RefKind.ToCSharpString();
             if (refKindModifier is not null)
@@ -918,7 +917,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
             parameter.WriteVerbatimizedName(writer);
 
-            if (i != parameters.Length - 1)
+            if (!last)
             {
                 writer.Write(", ");
             }
@@ -1363,10 +1362,10 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             writer.Write(" : ");
 
             var constraintStrings = EnumerateConstraintStrings(typeParameter).ToArray();
-            foreach ((var j, var constraintString) in constraintStrings.IndicesAndItems())
+            foreach ((var constraintString, var last) in constraintStrings.WithLastFlag())
             {
                 writer.Write(constraintString);
-                if (j != constraintStrings.Length - 1)
+                if (!last)
                 {
                     writer.Write(", ");
                 }
@@ -1427,10 +1426,10 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         }
 
         writer.Write("<");
-        foreach ((var i, var typeParameter) in typeParameters.IndicesAndItems())
+        foreach ((var typeParameter, var last) in typeParameters.WithLastFlag())
         {
             writer.Write(typeParameter.Name);
-            if (i != typeParameters.Length - 1)
+            if (!last)
             {
                 writer.Write(", ");
             }

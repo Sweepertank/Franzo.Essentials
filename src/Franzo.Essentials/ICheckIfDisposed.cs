@@ -4,8 +4,7 @@ public partial interface ICheckIfDisposed
 {
     public bool IsDisposed { get; }
 
-    // @AfterBaseT: protected
-    public sealed void ThrowIfDisposed(Func<Exception> exceptionFactory)
+    protected sealed void ThrowIfDisposed(Func<Exception> exceptionFactory)
     {
         if (IsDisposed)
         {
@@ -13,7 +12,7 @@ public partial interface ICheckIfDisposed
         }
     }
 
-    public sealed void ThrowIfDisposed(string? objectName, string? message = null)
+    protected sealed void ThrowIfDisposed(string? objectName, string? message = null)
     {
         if (IsDisposed)
         {

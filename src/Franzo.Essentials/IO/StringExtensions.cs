@@ -1,4 +1,4 @@
-namespace Franzo.Essentials;
+namespace Franzo.Essentials.IO;
 
 public static class StringExtensions
 {

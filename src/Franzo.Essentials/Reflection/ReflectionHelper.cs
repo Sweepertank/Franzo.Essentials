@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Immutable;
 using System.Reflection;
 
 namespace Franzo.Essentials.Reflection;
@@ -15,7 +13,7 @@ public static class ReflectionHelper
     public const BindingFlags PublicInstanceStaticDeclaredOnlyBindingFlags =
         PublicInstanceBindingFlags | BindingFlags.Static | BindingFlags.DeclaredOnly;
 
-    private static readonly MethodInfo s_createImmutableArrayMethod =
+    /*private static readonly MethodInfo s_createImmutableArrayMethod =
         typeof(ReflectionHelper).GetMethodOrThrow(
             nameof(CreateImmutableArray),
             BindingFlags.Static | BindingFlags.NonPublic);
@@ -40,7 +38,7 @@ public static class ReflectionHelper
         return obj.GetType().GetPropertyOrFieldBetter(
             name,
             null,
-            ReflectionHelper.PublicInstanceBindingFlags);
+            PublicInstanceBindingFlags);
     }
 
     [Obsolete]
@@ -121,7 +119,7 @@ public static class ReflectionHelper
                 }
                 else
                 {
-                    typeArguments = new Type[] { itemType };
+                    typeArguments = new[] { itemType };
                 }
 
                 typeToInstantiate = genericTypeToInstantiate.MakeGenericType(typeArguments);
@@ -201,5 +199,5 @@ public static class ReflectionHelper
     private static ImmutableHashSet<T> CreateImmutableHashSet<T>(IEnumerable<T>? items)
     {
         return items?.ToImmutableHashSet() ?? ImmutableHashSet<T>.Empty;
-    }
+    }*/
 }

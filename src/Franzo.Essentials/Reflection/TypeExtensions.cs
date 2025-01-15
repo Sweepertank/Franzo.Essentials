@@ -588,13 +588,13 @@ public static class TypeExtensions
         return self.Name.WithoutSuffix(suffix);
     }
 
-    [Obsolete]
+    /*[Obsolete]
     public static object? CreateDefaultValue(this Type self, NullabilityInfo? nullabilityInfo = null)
     {
         return self.IsNullable(nullabilityInfo)
             ? null
             : ReflectionHelper.CreateInstanceAssignableTo(self);
-    }
+    }*/
 
     private static void ThrowIfTypeIsNotGenericDefinition(Type type, string paramName)
     {

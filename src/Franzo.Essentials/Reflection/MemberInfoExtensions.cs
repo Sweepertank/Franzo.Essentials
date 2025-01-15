@@ -87,7 +87,7 @@ public static class MemberInfoExtensions
         return ReflectedTypeInvariantMemberInfoEqualityComparer.Instance.Equals(self, other);
     }
 
-    [Obsolete]
+    /*[Obsolete]
     public static MemberInfo[] GetMembersHiding(this MemberInfo self)
     {
         // https://stackoverflow.com/questions/288357/how-does-reflection-tell-me-when-a-property-is-hiding-an-inherited-member-with-t
@@ -109,5 +109,5 @@ public static class MemberInfoExtensions
     public static bool HidesAnyProperties(this MemberInfo self)
     {
         return self.GetPropertiesHiding().Any();
-    }
+    }*/
 }

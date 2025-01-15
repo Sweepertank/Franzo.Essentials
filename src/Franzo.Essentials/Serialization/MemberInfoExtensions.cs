@@ -37,6 +37,6 @@ public static class MemberInfoExtensions
 
     public static bool IsItemsProperty(this MemberInfo self)
     {
-        return self.MemberEquals(ICommonSerializable.ItemsProperty);
+        return self.MemberEquals(IReadOnlyCommonSerializable.ItemsProperty);
     }
 }

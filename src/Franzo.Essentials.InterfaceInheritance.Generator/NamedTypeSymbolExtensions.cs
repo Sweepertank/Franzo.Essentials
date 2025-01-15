@@ -54,12 +54,12 @@ internal static class NamedTypeSymbolExtensions
             var sb = new StringBuilder();
             sb.Append("__");
 
-            foreach ((var i, var typeArgument) in self.TypeArguments.IndicesAndItems())
+            foreach ((var typeArgument, var last) in self.TypeArguments.WithLastFlag())
             {
                 sb.Append(
                     Mangle(typeArgument.ToDisplayString(TypeQualifiedWithTypeParametersFormat)));
 
-                if (i != self.TypeArguments.Length - 1)
+                if (!last)
                 {
                     sb.Append("_");
                 }

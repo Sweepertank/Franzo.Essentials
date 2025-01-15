@@ -7,6 +7,11 @@ public static class PredicateHelper
         return x => true;
     }
 
+    public static Predicate<T> OrTautology<T>(this Predicate<T>? self)
+    {
+        return self ?? Tautology<T>();
+    }
+
     public static Predicate<T> Contradiction<T>()
     {
         return x => false;

@@ -1,5 +1,4 @@
 using System.Reflection;
-using Franzo.Essentials;
 using Franzo.Essentials.ComponentModel;
 
 namespace Franzo.Essentials.Reflection;
@@ -78,7 +77,7 @@ public static class PropertyInfoExtensions
         return self.SetMethod.ExistsAndIsPublic();
     }
 
-    [Obsolete]
+    /*[Obsolete]
     public static bool IsHiddenByPropertyOn(this PropertyInfo self, Type type)
     {
         if (self.DeclaringType is null
@@ -90,5 +89,5 @@ public static class PropertyInfoExtensions
 
         var propertyOfSameName = type.GetProperty(self.Name);
         return !propertyOfSameName.MemberEquals(self);
-    }
+    }*/
 }

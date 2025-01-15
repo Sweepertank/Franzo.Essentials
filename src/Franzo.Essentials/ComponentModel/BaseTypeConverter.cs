@@ -15,6 +15,23 @@ public abstract class BaseTypeConverter<T> : BaseTypeConverter
         get => typeof(T);
     }
 
+    public virtual T ConvertFromGeneric(
+        ITypeDescriptorContext? context,
+        CultureInfo? culture,
+        object value)
+    {
+        return (T)base.ConvertFrom(context, culture, value)!;
+    }
+
+    public virtual object? ConvertToGeneric(
+        ITypeDescriptorContext? context,
+        CultureInfo? culture,
+        T value,
+        Type destinationType)
+    {
+        return base.ConvertTo(null, culture, value, destinationType);
+    }
+
     public sealed override object? ConvertFrom(
         ITypeDescriptorContext? context,
         CultureInfo? culture,
@@ -35,22 +52,5 @@ public abstract class BaseTypeConverter<T> : BaseTypeConverter
         }
 
         return ConvertToGeneric(context, culture, castedValue, destinationType);
-    }
-
-    public virtual T ConvertFromGeneric(
-        ITypeDescriptorContext? context,
-        CultureInfo? culture,
-        object value)
-    {
-        return (T)base.ConvertFrom(context, culture, value)!;
-    }
-
-    public virtual object? ConvertToGeneric(
-        ITypeDescriptorContext? context,
-        CultureInfo? culture,
-        T value,
-        Type destinationType)
-    {
-        return base.ConvertTo(null, culture, value, destinationType);
     }
 }

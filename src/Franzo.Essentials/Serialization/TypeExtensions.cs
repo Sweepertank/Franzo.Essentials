@@ -50,7 +50,7 @@ public static class TypeExtensions
         }
 
         return self.ImplementsIReadOnlyCollection_T_ExactlyOnce()
-            ? new PropertyOrFieldInfo(ICommonSerializable.ItemsProperty)
+            ? new PropertyOrFieldInfo(IReadOnlyCommonSerializable.ItemsProperty)
             : null;
     }
 

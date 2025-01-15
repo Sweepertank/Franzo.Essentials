@@ -1,8 +1,8 @@
 namespace Franzo.Essentials;
 
-public static class StringExtensionsASF
+public static class StringExtensions
 {
-    [Obsolete]
+    /*[Obsolete]
     public static bool IsNullOrEqualTo(this string? self, string other)
     {
         return self is null || self == other;
@@ -12,7 +12,7 @@ public static class StringExtensionsASF
     public static int CountTextElements(this string self)
     {
         return self.AsSpan().CountTextElements();
-    }
+    }*/
 
     public static string RemoveStartingAtFirstIndexOf(this string self, char character)
     {
@@ -58,11 +58,11 @@ public static class StringExtensionsASF
         return self.Remove(0, index + 1);
     }
 
-    [Obsolete]
+    /*[Obsolete]
     public static string GetTypeName(this string fullTypeName)
     {
         return fullTypeName.RemoveUpToAndIncludingLastIndexOf(Type.Delimiter);
-    }
+    }*/
 
     public static string RemoveLastNChars(this string self, int n)
     {
@@ -82,7 +82,7 @@ public static class StringExtensionsASF
     }
 
     // @Robustness: Test this
-    [Obsolete]
+    /*[Obsolete]
     public static bool ContainsUnpairedSurrogates(this string self)
     {
         if (self.Length == 1)
@@ -116,7 +116,7 @@ public static class StringExtensionsASF
         }
 
         return false;
-    }
+    }*/
 
     public static string[] ParseKebabCase(this string self)
     {

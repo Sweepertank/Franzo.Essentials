@@ -9,6 +9,7 @@ public static class ListExtensions
         {
             index = ~index;
         }
+
         self.Insert(index, item);
     }
 }

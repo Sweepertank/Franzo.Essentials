@@ -1,10 +1,8 @@
-using Franzo.Essentials.Reflection;
-
 namespace Franzo.Essentials.ComponentModel;
 
 public static class TypeExtensions
 {
-    [Obsolete]
+    /*[Obsolete]
     public static Type? TypeTypeConverterTypeCanConvert(this Type self)
     {
         var baseTypeConverterType = self.AncestorTypeWithGenericDefinition(typeof(BaseTypeConverter<>));
@@ -14,5 +12,5 @@ public static class TypeExtensions
         }
 
         return baseTypeConverterType.GetGenericArguments()[0];
-    }
+    }*/
 }

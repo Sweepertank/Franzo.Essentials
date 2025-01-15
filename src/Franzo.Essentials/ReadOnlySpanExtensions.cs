@@ -1,10 +1,8 @@
-using System.Globalization;
-
 namespace Franzo.Essentials;
 
 public static class ReadOnlySpanExtensions
 {
-    [Obsolete]
+    /*[Obsolete]
     public static int CountTextElements(this ReadOnlySpan<char> self)
     {
         var count = 0;
@@ -17,7 +15,7 @@ public static class ReadOnlySpanExtensions
         }
 
         return count;
-    }
+    }*/
 
     public static int IndexOf<T>(this ReadOnlySpan<T> self, Predicate<T> predicate)
     {

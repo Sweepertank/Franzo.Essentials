@@ -19,7 +19,7 @@ public class NullableAwareType
         GenericTypeArguments = genericTypeArguments.ToImmutableList();
     }
 
-    public NullableAwareType MakeNullable()
+    public NullableAwareType ToNullable()
     {
         var newType = Type;
         IEnumerable<NullableAwareType> newGenericTypeArgs = GenericTypeArguments;
@@ -32,7 +32,7 @@ public class NullableAwareType
         return Create(newType, true, newGenericTypeArgs);
     }
 
-    public NullableAwareType MakeNonNullable()
+    public NullableAwareType ToNonNullable()
     {
         var newType = Type;
         IEnumerable<NullableAwareType> newGenericTypeArgs = GenericTypeArguments;

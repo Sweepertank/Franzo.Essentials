@@ -76,7 +76,7 @@ public static class ComponentReflectionHelper
             getMethod.ReturnType);
         var createdDelegate = method.Invoke(
             null,
-            new object?[]
+            new[]
             {
                 getMethod
             })!;

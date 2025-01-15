@@ -139,7 +139,8 @@ public static class SymbolExtensions
     }
 
     // @todo: this should return T eventually
-    public static IEnumerable<AttributeData> GetAttributes<T>(this ISymbol self) where T : Attribute
+    public static IEnumerable<AttributeData> GetAttributes<T>(this ISymbol self)
+        where T : Attribute
     {
         return self.GetAttributes().Where(
             a => a.AttributeClass?.ToDisplayString() == typeof(T).FullName);

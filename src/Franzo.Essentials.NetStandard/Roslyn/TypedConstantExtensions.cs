@@ -44,7 +44,9 @@ public static class TypedConstantExtensions
                     .GetMethod(nameof(TryGetReadableValue))!
                     .MakeGenericMethod(typeof(T).GetElementType());
 
-                var array = (IList)Activator.CreateInstance(typeof(T), new object?[] { self.Values.Length });
+                var array = (IList)Activator.CreateInstance(
+                    typeof(T),
+                    new[] { self.Values.Length });
                 for (int i = 0; i < self.Values.Length; i++)
                 {
                     var parameters = new object?[] { self.Values[i], null };
