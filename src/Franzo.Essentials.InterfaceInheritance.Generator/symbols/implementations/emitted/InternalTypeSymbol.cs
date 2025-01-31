@@ -18,6 +18,7 @@ internal class InternalTypeSymbol : InternalSymbol, IInternalTypeSymbol
     public bool IsDataClass = false;
     public InternalMethodSymbol? ConstructorIfDataClass = null;
     public bool EmitDefaultConstructor = false;
+    public bool DoNotGenerateInheritances = false;
 
     public IEnumerable<InternalFeatureSymbol> DeclaredFeatures
     {

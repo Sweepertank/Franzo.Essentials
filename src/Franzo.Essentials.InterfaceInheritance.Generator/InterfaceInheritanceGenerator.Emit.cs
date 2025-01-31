@@ -271,7 +271,8 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             writer.WriteLine();
         }
 
-        if (type.RoslynSymbol.TypeKind.IsClassOrStruct())
+        if (type.RoslynSymbol.TypeKind.IsClassOrStruct()
+            && !type.DoNotGenerateInheritances)
         {
             foreach (var @interface in type.Interfaces)
             {

@@ -78,6 +78,21 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
         InitializeTypeBaseTypesAndColonSpecifiedInterfaces(type, context);
 
+        if (type.RoslynSymbol.HasAttribute<DoNotGenerateInheritancesAttribute>())
+        {
+            if (type.RoslynSymbol.Name == InterfaceDataClassName)
+            {
+                context.ReportDiagnostic(
+                    Diagnostic.Create(
+                        DiagnosticDescriptors.Dummy,
+                        type.RoslynSymbol.Locations.First()));
+            }
+            else
+            {
+                type.DoNotGenerateInheritances = true;
+            }
+        }
+
         if (type.RoslynSymbol.Name == InterfaceDataClassName)
         {
             var invalid = false;
