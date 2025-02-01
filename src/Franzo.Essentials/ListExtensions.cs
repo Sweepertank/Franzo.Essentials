@@ -12,4 +12,12 @@ public static class ListExtensions
 
         self.Insert(index, item);
     }
+
+    public static void Truncate<T>(this IList<T> self, int count)
+    {
+        while (self.Count > count)
+        {
+            self.RemoveAt(self.Count - 1);
+        }
+    }
 }
