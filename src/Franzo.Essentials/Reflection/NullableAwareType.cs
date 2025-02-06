@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using System.Reflection;
+using Franzo.Essentials.Collections;
 
 namespace Franzo.Essentials.Reflection;
 

@@ -1,4 +1,4 @@
-namespace Franzo.Essentials;
+namespace Franzo.Essentials.Collections;
 
 // https://stackoverflow.com/questions/21758074/compare-two-dictionaries-for-equality
 

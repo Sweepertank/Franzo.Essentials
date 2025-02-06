@@ -1,6 +1,6 @@
 using System.Collections;
 
-namespace Franzo.Essentials;
+namespace Franzo.Essentials.Collections;
 
 public static class EnumerableExtensions
 {

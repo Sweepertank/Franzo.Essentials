@@ -2,6 +2,7 @@ using System.CodeDom.Compiler;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Text;
+using Franzo.Essentials.Collections;
 using Franzo.Essentials.Roslyn;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;

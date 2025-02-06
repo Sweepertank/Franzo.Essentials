@@ -1,4 +1,5 @@
 using System.Text;
+using Franzo.Essentials.Collections;
 using Microsoft.CodeAnalysis;
 
 namespace Franzo.Essentials.InterfaceInheritance.Generator;
