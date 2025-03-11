@@ -16,6 +16,16 @@ public static class StringExtensions
         return self.AsSpan().CountTextElements();
     }*/
 
+    public static StringSpan ToStringSpan(this string self)
+    {
+        return new StringSpan(self, 0, self.Length);
+    }
+
+    public static StringSpan ToStringSpan(this string self, int start, int length)
+    {
+        return new StringSpan(self, start, length);
+    }
+
     public static string RemoveStartingAtFirstIndexOf(this string self, char character)
     {
         var index = self.IndexOf(character);
