@@ -1,4 +1,6 @@
+using System.Collections.Immutable;
 using System.Reflection;
+using System.Text;
 using System.Text.RegularExpressions;
 using Franzo.Essentials.Reflection;
 using Microsoft.CodeAnalysis;
@@ -13,10 +15,10 @@ public static class SymbolExtensions
         SymbolDisplayFormat.FullyQualifiedFormat.AddMiscellaneousOptions(
             SymbolDisplayMiscellaneousOptions.IncludeNullableReferenceTypeModifier);
 
-    private static SymbolDisplayFormat NamespaceQualifiedFormat = new(
+    private static SymbolDisplayFormat NamespaceQualifiedTypeParameterlessFormat = new(
         globalNamespaceStyle: SymbolDisplayGlobalNamespaceStyle.Omitted,
         typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces,
-        genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters,
+        genericsOptions: SymbolDisplayGenericsOptions.None,
         miscellaneousOptions:
             SymbolDisplayMiscellaneousOptions.EscapeKeywordIdentifiers |
             SymbolDisplayMiscellaneousOptions.UseSpecialTypes);
@@ -63,6 +65,16 @@ public static class SymbolExtensions
         var formatConstructor = typeof(SymbolDisplayFormat)
             .GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance)
             .Single();
+    }
+
+    public static ImmutableArray<ITypeParameterSymbol> TypeParameters(this ISymbol self)
+    {
+        return self switch
+        {
+            INamedTypeSymbol type => type.TypeParameters,
+            IMethodSymbol method => method.TypeParameters,
+            _ => ImmutableArray<ITypeParameterSymbol>.Empty
+        };
     }
 
     public static bool CorrectEquals(this ISymbol? self, ISymbol? other)
@@ -118,9 +130,16 @@ public static class SymbolExtensions
 
     public static string ToNamespaceQualifiedFileSystemDisplayString(this ISymbol self)
     {
-        return self.ToDisplayString(NamespaceQualifiedFormat)
-            .Replace('<', '{')
-            .Replace('>', '}');
+        var sb = new StringBuilder();
+        sb.Append(self.ToDisplayString(NamespaceQualifiedTypeParameterlessFormat));
+        if (self.TypeParameters().Length > 0)
+        {
+            sb.Append("{");
+            sb.Append(','.Repeat(self.TypeParameters().Length - 1));
+            sb.Append("}");
+        }
+
+        return sb.ToString();
     }
 
     public static string ToSimpleDisplayString(this ISymbol self)
