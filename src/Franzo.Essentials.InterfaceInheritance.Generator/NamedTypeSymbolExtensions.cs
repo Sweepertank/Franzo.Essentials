@@ -33,9 +33,7 @@ internal static class NamedTypeSymbolExtensions
 
     public static bool IsCompilerGeneratedAttributeType(this INamedTypeSymbol self)
     {
-        return self.ToDisplayString()
-            is "System.Runtime.CompilerServices.NullableContextAttribute"
-            or "System.Runtime.CompilerServices.NullableAttribute";
+        return self.ToDisplayString().StartsWith("System.Runtime.CompilerServices");
     }
 
     public static string MemberifiedName(this INamedTypeSymbol self)

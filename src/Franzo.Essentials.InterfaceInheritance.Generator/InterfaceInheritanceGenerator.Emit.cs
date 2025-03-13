@@ -298,7 +298,8 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                             IsConst: false,
                             IsReadOnly: false
                         }
-                        || feature.RoslynSymbol.Name == type.RoslynSymbol.Name)
+                        || feature.RoslynSymbol.Name == type.RoslynSymbol.Name
+                        || (feature.RoslynSymbol.IsVirtual && feature.RoslynSymbol.IsStatic))
                     {
                         continue;
                     }
