@@ -10,7 +10,7 @@
       AfterTargets="AfterCompile"
       Condition="Exists(@(IntermediateAssembly)) And ($(DesignTimeBuild) != true Or $(BuildingForLiveUnitTesting) == true)">
     <!-- Inputs="@(IntermediateAssembly)" -->
-    <Franzo.Essentials.InterfaceInheritance.MSBuild.DevirtualizationTask AssemblyPath="@(IntermediateAssembly)" />
+    <Franzo.Essentials.InterfaceInheritance.MSBuild.DevirtualizationTask AssemblyPath="@(IntermediateAssembly)" ReferencePath="@(ReferencePath)" />
   </Target>
 
 </Project>

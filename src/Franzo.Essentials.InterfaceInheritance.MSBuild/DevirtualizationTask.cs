@@ -8,12 +8,18 @@ public class DevirtualizationTask : Microsoft.Build.Utilities.Task
     [Required]
     public string AssemblyPath { get; set; } = "";
 
+    [Required]
+    public string ReferencePath { get; set; } = "";
+
     public override bool Execute()
     {
-        var module = ModuleDefinition.ReadModule(AssemblyPath, new ReaderParameters()
+        var referencePaths = ReferencePath.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+        using var assemblyResolver = new AssemblyResolver(this, referencePaths);
+        using var module = ModuleDefinition.ReadModule(AssemblyPath, new ReaderParameters()
         {
             InMemory = true,
-            ReadSymbols = true
+            ReadSymbols = true,
+            AssemblyResolver = assemblyResolver
         });
 
         foreach (var type in module.GetTypes())
@@ -52,8 +58,6 @@ public class DevirtualizationTask : Microsoft.Build.Utilities.Task
         {
             WriteSymbols = true
         });
-
-        module.Dispose();
 
         return true;
     }
