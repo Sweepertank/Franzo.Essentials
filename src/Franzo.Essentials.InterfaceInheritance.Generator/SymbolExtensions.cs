@@ -11,6 +11,10 @@ internal static class SymbolExtensions
     public static readonly MethodInfo ComparerEqualsMethod;
     public static readonly MethodInfo UnderlyingSymbolGetter;
 
+    private static SymbolDisplayFormat FullyQualifiedWithoutGlobalNamespaceFormat =
+        SymbolDisplayFormat.FullyQualifiedFormat
+            .WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Omitted);
+
     static SymbolExtensions()
     {
         var codeAnalysisCSharpAssembly = typeof(CSharpCompilation).Assembly;
@@ -102,6 +106,19 @@ internal static class SymbolExtensions
         return self.DeclaredAccessibility
             is Accessibility.Public
             or Accessibility.Internal;
+    }
+
+    public static string ToMangledFullyQualifiedWithoutGlobalNamespaceDisplayString(
+        this ISymbol self)
+    {
+        return self.ToDisplayString(FullyQualifiedWithoutGlobalNamespaceFormat).MangleSymbolName();
+    }
+
+    public static bool IsProtectedOrProtectedAndOrInternalAndOriginalDefinitionIsGenericTypeContained(
+        this ISymbol self)
+    {
+        return self.IsProtectedOrProtectedAndOrInternal()
+            && self.OriginalDefinition.ContainingType.IsGenericType;
     }
 
     private static bool Compare(object comparer, ISymbol a, ISymbol b)

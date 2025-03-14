@@ -14,4 +14,9 @@ public static class NamedTypeSymbolExtensions
         return self.IsConstructedGenericType()
             || (self.ContainingType is not null && self.ContainingType.IsConstructedGenericTypeOrWithinConstructedGenericType());
     }
+
+    public static IEnumerable<INamedTypeSymbol> SelfAndContainingTypes(this INamedTypeSymbol self)
+    {
+        return ((ISymbol)self).SelfAndContainingTypes().Cast<INamedTypeSymbol>();
+    }
 }

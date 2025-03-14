@@ -7,8 +7,8 @@ internal abstract class InternalFeatureSymbol : InternalMemberSymbol
     public List<InternalTypeSymbol> TypesDeclaringShadowingFeatures = new();
     public bool HasOverrideAttribute = false;
 
-    public InternalFeatureSymbol(ISymbol roslynSymbol, InternalAnalysisContext context)
-        : base(roslynSymbol, context)
+    public InternalFeatureSymbol(ISymbol roslynSymbol, InternalAnalysisContext cxt)
+        : base(roslynSymbol, cxt)
     {
     }
 }

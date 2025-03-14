@@ -43,4 +43,12 @@ internal static class StringExtensions
 
         return self;
     }
+
+    public static string MangleSymbolName(this string str)
+    {
+        return str.Replace('.', '_')
+            .Replace("<", "__")
+            .Replace(">", "__")
+            .Replace(", ", "_");
+    }
 }

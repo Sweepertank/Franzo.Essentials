@@ -123,7 +123,8 @@ public static class SymbolExtensions
         return true;
     }
 
-    public static string ToFullyQualifiedDisplayString(this ISymbol self)
+    public static string ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(
+        this ISymbol self)
     {
         return self.ToDisplayString(FullyQualifiedWithNullableReferenceTypeAnnotationsFormat);
     }

@@ -11,19 +11,20 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
     internal const string InterfaceDataClassName = "Data_";
     internal const string GeneratedInterfaceDataPropertyName = "__Data_Prop";
     internal const string GeneratedConstructorPropertyName = "__Constructor";
+    //internal const string UnderscoreClassSuffix = "_Class";
 
-    public void Initialize(IncrementalGeneratorInitializationContext context)
+    public void Initialize(IncrementalGeneratorInitializationContext cxt)
     {
-        var types = context.SyntaxProvider
+        var types = cxt.SyntaxProvider
             .CreateSyntaxProvider<INamedTypeSymbol?>(
                 (node, _) => IsNodePossiblyRelevant(node),
                 (cxt, _) => GetNodeBoundTypeIfTopLevel(cxt))
             .Where(t => t is not null);
 
-        // @todo: use context.SyntaxProvider.ForAttributeWithMetadataName
+        // @todo: use cxt.SyntaxProvider.ForAttributeWithMetadataName
 
-        context.RegisterSourceOutput(
-            context.CompilationProvider.Combine(types.Collect()),
+        cxt.RegisterSourceOutput(
+            cxt.CompilationProvider.Combine(types.Collect()),
             Execute!);
     }
 
@@ -39,9 +40,9 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         return node is TypeDeclarationSyntax;
     }
 
-    private static INamedTypeSymbol? GetNodeBoundTypeIfTopLevel(GeneratorSyntaxContext context)
+    private static INamedTypeSymbol? GetNodeBoundTypeIfTopLevel(GeneratorSyntaxContext cxt)
     {
-        var type = context.SemanticModel.GetDeclaredSymbol((TypeDeclarationSyntax)context.Node);
+        var type = cxt.SemanticModel.GetDeclaredSymbol((TypeDeclarationSyntax)cxt.Node);
         if (type is null)
         {
             return null;
@@ -54,12 +55,12 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         SourceProductionContext sourceProductionContext,
         (Compilation, ImmutableArray<INamedTypeSymbol>) source)
     {
-        var context = new Context(
+        var cxt = new Context(
             (CSharpCompilation)source.Item1,
             source.Item2.ToImmutableHashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default),
             sourceProductionContext);
 
-        Analyze(new GenerationInternalAnalysisContext(context));
-        Emit(context);
+        Analyze(new GenerationInternalAnalysisContext(cxt));
+        Emit(cxt);
     }
 }

@@ -11,8 +11,8 @@ internal class InternalPropertySymbol :
         get => (IPropertySymbol)base.RoslynSymbol;
     }
 
-    public InternalPropertySymbol(IPropertySymbol roslynSymbol, InternalAnalysisContext context)
-        : base(roslynSymbol, context)
+    public InternalPropertySymbol(IPropertySymbol roslynSymbol, InternalAnalysisContext cxt)
+        : base(roslynSymbol, cxt)
     {
     }
 }

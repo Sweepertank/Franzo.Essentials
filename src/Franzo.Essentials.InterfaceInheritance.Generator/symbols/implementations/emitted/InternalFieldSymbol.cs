@@ -11,8 +11,8 @@ internal class InternalFieldSymbol :
         get => (IFieldSymbol)base.RoslynSymbol;
     }
 
-    public InternalFieldSymbol(IFieldSymbol roslynSymbol, InternalAnalysisContext context)
-        : base(roslynSymbol, context)
+    public InternalFieldSymbol(IFieldSymbol roslynSymbol, InternalAnalysisContext cxt)
+        : base(roslynSymbol, cxt)
     {
     }
 }

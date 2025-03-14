@@ -38,14 +38,6 @@ internal static class NamedTypeSymbolExtensions
 
     public static string MemberifiedName(this INamedTypeSymbol self)
     {
-        string Mangle(string str)
-        {
-            return str.Replace('.', '_')
-                .Replace("<", "__")
-                .Replace(">", "__")
-                .Replace(", ", "_");
-        }
-
         var s = self.Name.WithoutInterfaceI();
 
         if (self.TypeArguments.Length > 0)
@@ -56,7 +48,7 @@ internal static class NamedTypeSymbolExtensions
             foreach ((var typeArgument, var last) in self.TypeArguments.WithLastFlag())
             {
                 sb.Append(
-                    Mangle(typeArgument.ToDisplayString(TypeQualifiedWithTypeParametersFormat)));
+                    typeArgument.ToDisplayString(TypeQualifiedWithTypeParametersFormat).MangleSymbolName());
 
                 if (!last)
                 {
@@ -71,7 +63,7 @@ internal static class NamedTypeSymbolExtensions
 
         if (self.ContainingType is not null)
         {
-            s = Mangle(self.ContainingType.ToDisplayString(TypeQualifiedWithTypeParametersFormat))
+            s = self.ContainingType.ToDisplayString(TypeQualifiedWithTypeParametersFormat).MangleSymbolName()
                 + "_"
                 + s;
         }

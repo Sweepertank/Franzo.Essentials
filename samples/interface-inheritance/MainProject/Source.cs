@@ -7,27 +7,38 @@ public class Foo
 {
     public class Bar
     {
-
     }
 }
 
-public partial interface IOuter<F>
+public partial interface IOuter<F> where F : struct
 {
-    public partial interface IGeneric<T, U>
+    public partial interface IGeneric<T, U> where U : class, IServiceProvider
     {
+        protected static readonly string Ookstring = "Ookstring";
+
+        protected sealed void Horky<P>(int s, string f)
+        {
+            Console.WriteLine("Horky");
+        }
+
         public partial class Data_
         {
+            protected event EventHandler? Ev;
             public int DatafulProperty { get; protected set; }
         }
     }
 }
 
-public partial class Goop<T, U> : IOuter<int>.IGeneric<T, U>
+public partial class Goop<T, U> : IOuter<int>.IGeneric<T, U> where U : class, IServiceProvider
 {
     public Goop()
     {
         IOuter__int___Generic__T_U__Data = ConstructIOuter__int___Generic__T_U__();
         //Generic__T__Data = ConstructGeneric__T__();
+        DatafulProperty = 3;
+        Console.WriteLine(DatafulProperty);
+        Horky<string>(3, "rr");
+        Console.WriteLine(Ookstring);
     }
 }
 
@@ -41,7 +52,12 @@ public partial interface IAa
     public int Gupple { get; }
 
     [Override]
-    public string ToString();
+    public sealed string ToString()
+    {
+        return ToStringCore();
+    }
+
+    protected string ToStringCore();
 
     public void Shoot(int f, int @if);
 }
@@ -53,7 +69,7 @@ public partial interface IBb : IAa, IEnumerable<int>
         get => 1;
     }
 
-    string IAa.ToString()
+    string IAa.ToStringCore()
     {
         return "asd";
     }

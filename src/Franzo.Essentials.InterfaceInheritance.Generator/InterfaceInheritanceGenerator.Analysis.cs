@@ -5,39 +5,39 @@ namespace Franzo.Essentials.InterfaceInheritance.Generator;
 
 public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 {
-    internal static void Analyze(InternalAnalysisContext context)
+    internal static void Analyze(InternalAnalysisContext cxt)
     {
         // InterfacesDeclaringShadowingMembers
         // @todo: bring down documentation, use attributes
         // @todo: maybe multithread? at least emitting?
 
-        InitializeTypes_Phase1(context);
-        InitializeTypes_Phase2(context);
-        AnalyzeTypes_Phase1(context);
+        InitializeTypes_Phase1(cxt);
+        InitializeTypes_Phase2(cxt);
+        AnalyzeTypes_Phase1(cxt);
     }
 
-    private static void InitializeTypes_Phase1(InternalAnalysisContext context)
+    private static void InitializeTypes_Phase1(InternalAnalysisContext cxt)
     {
-        foreach (var roslynType in context.PossiblyRelevantTopLevelRoslynTypes)
+        foreach (var roslynType in cxt.PossiblyRelevantTopLevelRoslynTypes)
         {
             var x = roslynType.IsConstructedGenericType();
-            var type = CreateTypeIfEmitting(roslynType, null, context);
+            var type = CreateTypeIfEmitting(roslynType, null, cxt);
             if (type is null) continue;
 
-            context.Data.RootTypesToEmit.Add(type);
+            cxt.Data.RootTypesToEmit.Add(type);
         }
     }
 
     private static InternalTypeSymbol? CreateTypeIfEmitting(
         INamedTypeSymbol roslynType,
         InternalTypeSymbol? containingType,
-        InternalAnalysisContext context)
+        InternalAnalysisContext cxt)
     {
         var type = CreateType(
             roslynType,
             containingType,
             AnalysisPhase.TypeInitializationPhase1,
-            context,
+            cxt,
             false);
 
         foreach (var roslynDeclaredType in roslynType.GetTypeMembers())
@@ -45,7 +45,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             var declaredType = CreateTypeIfEmitting(
                 roslynDeclaredType,
                 type,
-                context);
+                cxt);
             if (declaredType is null) continue;
 
             type.DeclaredTypes.Add(declaredType);
@@ -59,30 +59,30 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         return type;
     }
 
-    private static void InitializeTypes_Phase2(InternalAnalysisContext context)
+    private static void InitializeTypes_Phase2(InternalAnalysisContext cxt)
     {
-        foreach (var type in context.Data.TypesCreatedDuringTypeInitializationPhase1)
+        foreach (var type in cxt.Data.TypesCreatedDuringTypeInitializationPhase1)
         {
-            InitializeType_Phase2(type, context);
+            InitializeType_Phase2(type, cxt);
         }
     }
 
     private static void InitializeType_Phase2(
         InternalTypeSymbol type,
-        InternalAnalysisContext context)
+        InternalAnalysisContext cxt)
     {
         if (type.HasPhase2Initialized)
         {
             return;
         }
 
-        InitializeTypeBaseTypesAndColonSpecifiedInterfaces(type, context);
+        InitializeTypeBaseTypesAndColonSpecifiedInterfaces(type, cxt);
 
         if (type.RoslynSymbol.HasAttribute<DoNotGenerateInheritancesAttribute>())
         {
             if (type.RoslynSymbol.Name == InterfaceDataClassName)
             {
-                context.ReportDiagnostic(
+                cxt.ReportDiagnostic(
                     Diagnostic.Create(
                         DiagnosticDescriptors.Dummy,
                         type.RoslynSymbol.Locations.First()));
@@ -99,7 +99,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
             if (type.RoslynSymbol.TypeKind is not TypeKind.Class)
             {
-                context.ReportDiagnostic(
+                cxt.ReportDiagnostic(
                     Diagnostic.Create(
                         DiagnosticDescriptors.Dummy,
                         type.RoslynSymbol.Locations.First()));
@@ -110,7 +110,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             // a class without generic parameters nested inside a class *with* generic parameters
             if (type.RoslynSymbol.TypeParameters.Length > 0)
             {
-                context.ReportDiagnostic(
+                cxt.ReportDiagnostic(
                     Diagnostic.Create(
                         DiagnosticDescriptors.Dummy,
                         type.RoslynSymbol.Locations.First()));
@@ -119,7 +119,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
             if (type.RoslynSymbol.DeclaredAccessibility is not Accessibility.Public)
             {
-                context.ReportDiagnostic(
+                cxt.ReportDiagnostic(
                     Diagnostic.Create(
                         DiagnosticDescriptors.Dummy,
                         type.RoslynSymbol.Locations.First()));
@@ -128,7 +128,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
             if (type.ContainingType?.RoslynSymbol.TypeKind is not TypeKind.Interface)
             {
-                context.ReportDiagnostic(
+                cxt.ReportDiagnostic(
                     Diagnostic.Create(
                         DiagnosticDescriptors.Dummy,
                         type.RoslynSymbol.Locations.First()));
@@ -137,7 +137,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
             if (type.RoslynSymbol.Name != InterfaceDataClassName)
             {
-                context.ReportDiagnostic(
+                cxt.ReportDiagnostic(
                     Diagnostic.Create(
                         DiagnosticDescriptors.Dummy,
                         type.RoslynSymbol.Locations.First()));
@@ -153,7 +153,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                 m => m.RoslynSymbol.DeclaredAccessibility is Accessibility.Public);
             if (publicConstructors.Count() > 1)
             {
-                context.ReportDiagnostic(
+                cxt.ReportDiagnostic(
                     Diagnostic.Create(
                         DiagnosticDescriptors.Dummy,
                         type.RoslynSymbol.Locations.First()));
@@ -163,7 +163,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             var publicConstructor = publicConstructors.FirstOrDefault();
             if (publicConstructor is null)
             {
-                context.ReportDiagnostic(
+                cxt.ReportDiagnostic(
                     Diagnostic.Create(
                         DiagnosticDescriptors.Dummy,
                         type.RoslynSymbol.Locations.First()));
@@ -184,7 +184,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
             if (type.IsDataClass)
             {
-                context.ReportDiagnostic(
+                cxt.ReportDiagnostic(
                     Diagnostic.Create(DiagnosticDescriptors.Dummy, attribute.Location()));
                 invalid = true;
             }
@@ -197,14 +197,14 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
             if (type.RoslynSymbol.TypeKind is not TypeKind.Class)
             {
-                context.ReportDiagnostic(
+                cxt.ReportDiagnostic(
                     Diagnostic.Create(DiagnosticDescriptors.Dummy, attribute.Location()));
                 invalid = true;
             }
 
             if (!type.AreSelfAndContainingTypesPartiallyDeclared())
             {
-                context.ReportDiagnostic(
+                cxt.ReportDiagnostic(
                     Diagnostic.Create(DiagnosticDescriptors.Dummy, attribute.Location()));
                 invalid = true;
             }
@@ -213,7 +213,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             {
                 if (typeArgument.TypeKind is not TypeKind.Interface)
                 {
-                    context.ReportDiagnostic(
+                    cxt.ReportDiagnostic(
                         Diagnostic.Create(DiagnosticDescriptors.Dummy, attribute.Location()));
                     invalid = true;
                 }
@@ -222,7 +222,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                     typeArgument,
                     SymbolEqualityComparer.Default))
                 {
-                    context.ReportDiagnostic(
+                    cxt.ReportDiagnostic(
                         Diagnostic.Create(DiagnosticDescriptors.Dummy, attribute.Location()));
                     invalid = true;
                 }
@@ -234,11 +234,11 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                 typeArgument!,
                 null,
                 AnalysisPhase.TypeInitializationPhase2,
-                context);
+                cxt);
 
             if (type.AttributeSpecifiedDirectInterfaces.Contains(@interface))
             {
-                context.ReportDiagnostic(
+                cxt.ReportDiagnostic(
                     Diagnostic.Create(DiagnosticDescriptors.Dummy, attribute.Location()));
                 invalid = true;
             }
@@ -254,7 +254,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
             if (type.IsDataClass)
             {
-                context.ReportDiagnostic(
+                cxt.ReportDiagnostic(
                     Diagnostic.Create(DiagnosticDescriptors.Dummy, attribute.Location()));
                 invalid = true;
             }
@@ -265,27 +265,27 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                 out var interfaceName))
             {
                 invalid = true;
-                context.ReportDiagnostic(
+                cxt.ReportDiagnostic(
                     Diagnostic.Create(DiagnosticDescriptors.Dummy, attribute.Location()));
             }
             else if (interfaceName is null)
             {
-                context.ReportDiagnostic(
+                cxt.ReportDiagnostic(
                     Diagnostic.Create(DiagnosticDescriptors.Dummy, attribute.Location()));
                 invalid = true;
             }
             else if (!interfaceName.TryBindToType(
                 type.RoslynSymbol,
-                context.Compilation,
+                cxt.Compilation,
                 out var boundType))
             {
-                context.ReportDiagnostic(
+                cxt.ReportDiagnostic(
                     Diagnostic.Create(DiagnosticDescriptors.Dummy, attribute.Location()));
                 invalid = true;
             }
             else if (boundType!.TypeKind is not TypeKind.Interface)
             {
-                context.ReportDiagnostic(
+                cxt.ReportDiagnostic(
                     Diagnostic.Create(DiagnosticDescriptors.Dummy, attribute.Location()));
                 invalid = true;
             }
@@ -293,7 +293,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                 boundType,
                 SymbolEqualityComparer.Default))
             {
-                context.ReportDiagnostic(
+                cxt.ReportDiagnostic(
                     Diagnostic.Create(DiagnosticDescriptors.Dummy, attribute.Location()));
                 invalid = true;
             }
@@ -304,14 +304,14 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
             if (type.RoslynSymbol.TypeKind is not TypeKind.Class)
             {
-                context.ReportDiagnostic(
+                cxt.ReportDiagnostic(
                     Diagnostic.Create(DiagnosticDescriptors.Dummy, attribute.Location()));
                 invalid = true;
             }
 
             if (!type.AreSelfAndContainingTypesPartiallyDeclared())
             {
-                context.ReportDiagnostic(
+                cxt.ReportDiagnostic(
                     Diagnostic.Create(DiagnosticDescriptors.Dummy, attribute.Location()));
                 invalid = true;
             }
@@ -322,11 +322,11 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                 roslynInterface!,
                 null,
                 AnalysisPhase.TypeInitializationPhase2,
-                context);
+                cxt);
 
             if (type.AttributeSpecifiedDirectInterfaces.Contains(@interface))
             {
-                context.ReportDiagnostic(
+                cxt.ReportDiagnostic(
                     Diagnostic.Create(DiagnosticDescriptors.Dummy, attribute.Location()));
                 invalid = true;
             }
@@ -341,7 +341,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
     private static void InitializeTypeBaseTypesAndColonSpecifiedInterfaces(
         InternalTypeSymbol type,
-        InternalAnalysisContext context)
+        InternalAnalysisContext cxt)
     {
         /*if (type.HasInitializedBaseTypesAndInterfaces)
         {
@@ -354,7 +354,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                 type.RoslynSymbol.BaseType,
                 null,
                 AnalysisPhase.TypeInitializationPhase2,
-                context);
+                cxt);
         }
 
         // This check is just an optimization -
@@ -369,7 +369,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                 roslynInterface,
                 null,
                 AnalysisPhase.TypeInitializationPhase2,
-                context);
+                cxt);
             type.ColonSpecifiedDirectInterfaces.Add(@interface);
         }
         //}
@@ -377,17 +377,17 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         //type.HasInitializedBaseTypesAndInterfaces = true;
     }
 
-    private static void AnalyzeTypes_Phase1(InternalAnalysisContext context)
+    private static void AnalyzeTypes_Phase1(InternalAnalysisContext cxt)
     {
-        foreach (var type in context.Data.TypesCreatedDuringTypeInitializationPhase1)
+        foreach (var type in cxt.Data.TypesCreatedDuringTypeInitializationPhase1)
         {
-            AnalyzeType_Phase1(type, context);
+            AnalyzeType_Phase1(type, cxt);
         }
     }
 
     private static void AnalyzeType_Phase1(
         InternalTypeSymbol type,
-        InternalAnalysisContext context)
+        InternalAnalysisContext cxt)
     {
         if (type.HasPhase1Analyzed)
         {
@@ -402,7 +402,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                 {
                     if (feature.RoslynSymbol.MemberCollidesWith(
                         interfaceFeature.RoslynSymbol,
-                        context.Compilation)
+                        cxt.Compilation)
                         && !feature.RoslynSymbol.IsImplicitlyDeclared)
                     {
                         interfaceFeature.TypesDeclaringShadowingFeatures.Add(type);
@@ -419,7 +419,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             if (type.DataClass is null
                 && type.ColonSpecifiedDirectInterfaces.Any(i => i.DataClass is not null))
             {
-                context.ReportDiagnostic(
+                cxt.ReportDiagnostic(
                     Diagnostic.Create(
                         DiagnosticDescriptors.Dummy,
                         type.RoslynSymbol.Locations.First()));
@@ -448,7 +448,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                     if (@interface.DataClass is not null
                         && !@interface.DataClass.ConstructorIfDataClass!.RoslynSymbol.CanBeCalledWithZeroArgumentsInSource())
                     {
-                        context.ReportDiagnostic(
+                        cxt.ReportDiagnostic(
                             Diagnostic.Create(
                                 DiagnosticDescriptors.Dummy,
                                 type.RoslynSymbol.Locations.First()));
@@ -460,7 +460,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                 if (type.BaseType is not null)
                 {
                     if (!type.BaseType.DeclaredConstructors.Any(
-                        c => c.RoslynSymbol.IsAccessibleWithin(type.RoslynSymbol, context.Compilation)
+                        c => c.RoslynSymbol.IsAccessibleWithin(type.RoslynSymbol, cxt.Compilation)
                             && c.RoslynSymbol.CanBeCalledWithZeroArgumentsInSource()))
                     {
                         enableEmitDefaultConstructor = true;
@@ -476,12 +476,12 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
         if (type.BaseType is not null)
         {
-            AnalyzeType_Phase1(type.BaseType, context);
+            AnalyzeType_Phase1(type.BaseType, cxt);
         }
 
         foreach (var @interface in type.DirectInterfaces)
         {
-            AnalyzeType_Phase1(@interface, context);
+            AnalyzeType_Phase1(@interface, cxt);
         }
 
         type.HasPhase1Analyzed = true;
@@ -491,43 +491,43 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         INamedTypeSymbol roslynType,
         InternalTypeSymbol? containingType,
         AnalysisPhase phase,
-        InternalAnalysisContext context)
+        InternalAnalysisContext cxt)
     {
-        if (context.Data.TypesByRoslynType.TryGetValue(roslynType, out var type))
+        if (cxt.Data.TypesByRoslynType.TryGetValue(roslynType, out var type))
         {
             return type;
         }
 
-        return CreateType(roslynType, containingType, phase, context, false);
+        return CreateType(roslynType, containingType, phase, cxt, false);
     }
 
     private static InternalTypeSymbol CreateType(
         INamedTypeSymbol roslynType,
         InternalTypeSymbol? containingType,
         AnalysisPhase phase,
-        InternalAnalysisContext context,
+        InternalAnalysisContext cxt,
         bool isADataClassFromMetadata)
     {
-        var type = new InternalTypeSymbol(roslynType, containingType, context);
+        var type = new InternalTypeSymbol(roslynType, containingType, cxt);
 
         foreach (var roslynFeature in roslynType.GetMembers())
         {
             InternalFeatureSymbol feature;
             if (roslynFeature is IPropertySymbol roslynProperty)
             {
-                feature = new InternalPropertySymbol(roslynProperty, context);
+                feature = new InternalPropertySymbol(roslynProperty, cxt);
             }
             else if (roslynFeature is IFieldSymbol roslynField)
             {
-                feature = new InternalFieldSymbol(roslynField, context);
+                feature = new InternalFieldSymbol(roslynField, cxt);
             }
             else if (roslynFeature is IMethodSymbol roslynMethod)
             {
-                feature = new InternalMethodSymbol(roslynMethod, context);
+                feature = new InternalMethodSymbol(roslynMethod, cxt);
             }
             else if (roslynFeature is IEventSymbol roslynEvent)
             {
-                feature = new InternalEventSymbol(roslynEvent, context);
+                feature = new InternalEventSymbol(roslynEvent, cxt);
             }
             else
             {
@@ -540,14 +540,14 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         switch (phase)
         {
             case AnalysisPhase.TypeInitializationPhase1:
-                context.Data.TypesCreatedDuringTypeInitializationPhase1.Add(type);
+                cxt.Data.TypesCreatedDuringTypeInitializationPhase1.Add(type);
                 break;
             case AnalysisPhase.TypeInitializationPhase2:
-                if ((!roslynType.ContainingAssembly.CorrectEquals(context.Compilation.Assembly)
+                if ((!roslynType.ContainingAssembly.CorrectEquals(cxt.Compilation.Assembly)
                      && !isADataClassFromMetadata)
                     || roslynType.IsConstructedGenericTypeOrWithinConstructedGenericType())
                 {
-                    InitializeTypeBaseTypesAndColonSpecifiedInterfaces(type, context);
+                    InitializeTypeBaseTypesAndColonSpecifiedInterfaces(type, cxt);
 
                     if (roslynType.TypeKind is TypeKind.Interface)
                     {
@@ -560,7 +560,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                                 roslynDataClass,
                                 type,
                                 AnalysisPhase.TypeInitializationPhase2,
-                                context,
+                                cxt,
                                 true);
                             dataClass.IsDataClass = true;
                             dataClass.ConstructorIfDataClass = dataClass.DeclaredConstructors.First();
@@ -572,11 +572,11 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                     }
                 }
 
-                context.Data.TypesCreatedDuringTypeInitializationPhase2.Add(type);
+                cxt.Data.TypesCreatedDuringTypeInitializationPhase2.Add(type);
                 break;
         };
 
-        context.Data.TypesByRoslynType[roslynType] = type;
+        cxt.Data.TypesByRoslynType[roslynType] = type;
 
         return type;
     }

@@ -97,8 +97,8 @@ internal class InternalTypeSymbol : InternalSymbol, IInternalTypeSymbol
     public InternalTypeSymbol(
         INamedTypeSymbol roslynSymbol,
         InternalTypeSymbol? containingType,
-        InternalAnalysisContext context)
-        : base(roslynSymbol, context)
+        InternalAnalysisContext cxt)
+        : base(roslynSymbol, cxt)
     {
         ContainingType = containingType;
     }
