@@ -35,7 +35,7 @@ public readonly struct StringSpan : IReadOnlyList<char>
         {
             throw new ArgumentOutOfRangeException(nameof(length), length, null);
         }
-        else if (start < 0 || start >= @string.Length)
+        else if (start < 0 || start > @string.Length)
         {
             throw new ArgumentOutOfRangeException(nameof(start), start, null);
         }
