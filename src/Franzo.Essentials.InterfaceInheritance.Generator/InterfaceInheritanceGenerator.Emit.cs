@@ -147,11 +147,23 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
         if (type.IsDataClass)
         {
-            cxt.Writer.Write("public static readonly global::System.Reflection.ConstructorInfo ");
-            cxt.Writer.Write(GeneratedConstructorPropertyName);
-            cxt.Writer.Write(" = typeof(");
+            cxt.Writer.Write("[global::System.Runtime.CompilerServices.UnsafeAccessorAttribute(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Method, Name = \".ctor\")]");
+            cxt.Writer.WriteLine();
+            cxt.Writer.Write("public extern static void ");
+            cxt.Writer.Write(GeneratedConstructorAccessorName);
+            cxt.Writer.Write("(");
             cxt.Writer.Write(type.RoslynSymbol.ToDisplayString());
-            cxt.Writer.Write(").GetConstructors()[0];");
+            cxt.Writer.Write(" c");
+            if (type.ConstructorIfDataClass!.RoslynSymbol.Parameters.Length > 0)
+            {
+                cxt.Writer.Write(", ");
+                EmitUnparenthesizedParameterList(
+                    type.ConstructorIfDataClass!.RoslynSymbol.Parameters,
+                    type.RoslynSymbol,
+                    cxt,
+                    isForUnsafeAccessor: true);
+            }
+            cxt.Writer.Write(");");
             cxt.Writer.WriteLine();
 
             foreach (var @event in type.DeclaredEvents)
@@ -458,8 +470,8 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             cxt.Writer.Write(".");
             cxt.Writer.Write(InterfaceDataClassName);
             cxt.Writer.Write(".");
-            cxt.Writer.Write(GeneratedConstructorPropertyName);
-            cxt.Writer.Write(".Invoke(");
+            cxt.Writer.Write(GeneratedConstructorAccessorName);
+            cxt.Writer.Write("(");
             if (type.IsDataClass)
             {
                 cxt.Writer.Write("((");
@@ -473,11 +485,14 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             {
                 EmitRealDataFieldName(@interface, cxt);
             }
-            cxt.Writer.Write(", new object?[] { ");
-            EmitUnparenthesizedArgumentListFromParameters(
-                @interface.DataClass.ConstructorIfDataClass.RoslynSymbol.Parameters,
-                cxt);
-            cxt.Writer.Write(" });");
+            if (@interface.DataClass.ConstructorIfDataClass.RoslynSymbol.Parameters.Length > 0)
+            {
+                cxt.Writer.Write(", ");
+                EmitUnparenthesizedArgumentListFromParameters(
+                    @interface.DataClass.ConstructorIfDataClass.RoslynSymbol.Parameters,
+                    cxt);
+            }
+            cxt.Writer.Write(");");
             cxt.Writer.WriteLine();
 
             cxt.Writer.WriteLine($"return null!;");

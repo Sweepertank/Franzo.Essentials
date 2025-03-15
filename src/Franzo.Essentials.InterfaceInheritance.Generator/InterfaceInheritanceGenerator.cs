@@ -10,7 +10,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 {
     internal const string InterfaceDataClassName = "Data_";
     internal const string GeneratedInterfaceDataPropertyName = "__Data_Prop";
-    internal const string GeneratedConstructorPropertyName = "__Constructor";
+    internal const string GeneratedConstructorAccessorName = "__Construct";
     //internal const string UnderscoreClassSuffix = "_Class";
 
     public void Initialize(IncrementalGeneratorInitializationContext cxt)

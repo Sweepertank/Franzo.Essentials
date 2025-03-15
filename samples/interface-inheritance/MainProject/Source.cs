@@ -87,6 +87,16 @@ public partial interface IBb : IAa, IEnumerable<int>
     void IAa.Shoot(int f, int @if)
     {
     }
+
+    public partial class Data_
+    {
+        public int TestThingy { get; set; } = 0;
+
+        public Data_(int testThingy, string x = "")
+        {
+            TestThingy = testThingy;
+        }
+    }
 }
 
 public partial record class Cc : IBb
@@ -95,7 +105,8 @@ public partial record class Cc : IBb
 
     public Cc()
     {
-        Console.WriteLine(Yupple);
+        BbData = ConstructBb(4);
+        Console.WriteLine(TestThingy);
     }
 }
 
