@@ -506,7 +506,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         TypeEmissionContext cxt)
     {
         cxt.Writer.Write(@interface.RoslynSymbol.MemberifiedName());
-        cxt.Writer.Write("Data");
+        cxt.Writer.Write(DataString);
     }
 
     private static void EmitConstructMethodName(
@@ -522,7 +522,8 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         TypeEmissionContext cxt)
     {
         cxt.Writer.Write("__");
-        EmitFakeDataFieldName(@interface, cxt);
+        cxt.Writer.Write(@interface.RoslynSymbol.ToMangledFullyQualifiedWithoutGlobalNamespaceDisplayString());
+        cxt.Writer.Write(DataString);
     }
 
     private static void EmitMainModifiers(
