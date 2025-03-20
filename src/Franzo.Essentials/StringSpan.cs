@@ -73,7 +73,7 @@ public readonly struct StringSpan : IReadOnlyList<char>
     private class Enumerator : IEnumerator<char>
     {
         public StringSpan Span { get; }
-        public int CurrentIndex { get; private set; }
+        public int CurrentIndex { get; private set; } = -1;
 
         public char Current
         {
@@ -88,12 +88,11 @@ public readonly struct StringSpan : IReadOnlyList<char>
         public Enumerator(StringSpan span)
         {
             Span = span;
-            CurrentIndex = 0;
         }
 
         public bool MoveNext()
         {
-            if (CurrentIndex == Span.Length)
+            if (CurrentIndex == Span.Length - 1)
             {
                 return false;
             }
@@ -104,7 +103,7 @@ public readonly struct StringSpan : IReadOnlyList<char>
 
         public void Reset()
         {
-            CurrentIndex = 0;
+            CurrentIndex = -1;
         }
 
         public void Dispose()
