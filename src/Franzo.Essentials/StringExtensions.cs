@@ -137,4 +137,9 @@ public static class StringExtensions
     {
         return string.Join(null, self.ParseKebabCase().Select(s => s.Capitalize()));
     }
+
+    public static bool HasUnpairedSurrogates(this string self)
+    {
+        return self.AsSpan().HasUnpairedSurrogates();
+    }
 }
