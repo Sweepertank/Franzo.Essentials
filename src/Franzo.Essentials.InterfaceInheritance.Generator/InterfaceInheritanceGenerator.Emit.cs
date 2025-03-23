@@ -109,9 +109,9 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         {
             cxt.Writer.Write(" : ");
             cxt.Writer.Write(typeof(InterfaceData).GloballyQualifiedName());
-            cxt.Writer.Write("<");
-            cxt.Writer.Write(type.ContainingType!.RoslynSymbol.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
-            cxt.Writer.Write(">");
+            //cxt.Writer.Write("<");
+            //cxt.Writer.Write(type.ContainingType!.RoslynSymbol.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
+            //cxt.Writer.Write(">");
         }
         /*else if (type.RoslynSymbol.TypeKind.IsClassOrStruct())
         {
@@ -165,6 +165,21 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             }
             cxt.Writer.Write(");");
             cxt.Writer.WriteLine();
+
+            cxt.Writer.Write("private ");
+            cxt.Writer.Write(type.ContainingType!.RoslynSymbol.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
+            cxt.Writer.Write(" ");
+            cxt.Writer.Write(nameof(InterfaceData.This));
+            cxt.Writer.WriteLine();
+            cxt.Writer.WriteBracedSectionStart();
+            cxt.Writer.Write("get => (");
+            cxt.Writer.Write(type.ContainingType!.RoslynSymbol.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
+            cxt.Writer.Write(")");
+            cxt.Writer.Write("base.");
+            cxt.Writer.Write(nameof(InterfaceData.This));
+            cxt.Writer.Write(";");
+            cxt.Writer.WriteLine();
+            cxt.Writer.WriteBracedSectionEnd();
 
             foreach (var @event in type.DeclaredEvents)
             {
@@ -235,7 +250,8 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                             IsReadOnly: false
                         }
                         || feature.RoslynSymbol.Name == type.RoslynSymbol.Name
-                        || (feature.RoslynSymbol.IsVirtual && feature.RoslynSymbol.IsStatic))
+                        || ((feature.RoslynSymbol.IsAbstract || feature.RoslynSymbol.IsVirtual)
+                            && feature.RoslynSymbol.IsStatic))
                     {
                         continue;
                     }
@@ -436,7 +452,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                 cxt.Writer.Write("((");
                 cxt.Writer.Write(@interface.RoslynSymbol.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
                 cxt.Writer.Write(")");
-                cxt.Writer.Write(nameof(InterfaceData<object>.This));
+                cxt.Writer.Write(nameof(InterfaceData.This));
                 cxt.Writer.Write(").");
                 cxt.Writer.Write(GeneratedInterfaceDataPropertyName);
             }
@@ -457,7 +473,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
                     EmitRealDataFieldName(ancestorInterface, cxt);
                     cxt.Writer.Write(".");
-                    cxt.Writer.Write(nameof(InterfaceData<object>.__This));
+                    cxt.Writer.Write(nameof(InterfaceData.__This));
                     cxt.Writer.Write(" = this;");
                     cxt.Writer.WriteLine();
                 }
@@ -477,7 +493,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                 cxt.Writer.Write("((");
                 cxt.Writer.Write(@interface.RoslynSymbol.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
                 cxt.Writer.Write(")");
-                cxt.Writer.Write(nameof(InterfaceData<object>.This));
+                cxt.Writer.Write(nameof(InterfaceData.This));
                 cxt.Writer.Write(").");
                 cxt.Writer.Write(GeneratedInterfaceDataPropertyName);
             }
