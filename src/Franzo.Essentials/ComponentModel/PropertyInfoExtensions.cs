@@ -51,14 +51,14 @@ public static class PropertyInfoExtensions
         Type[] addMethodParameterTypes;
         if (self.PropertyType.ImplementsIReadOnlyDictionary_TKey_TValue())
         {
-            addMethodParameterTypes = new[] {
+            addMethodParameterTypes = [
                 itemType.GenericTypeArguments[0].Type,
                 itemType.GenericTypeArguments[1].Type
-            };
+            ];
         }
         else
         {
-            addMethodParameterTypes = new[] { itemType.Type };
+            addMethodParameterTypes = [itemType.Type];
         }
 
         var addMethod = self.DeclaringType.GetMethod(
@@ -128,7 +128,7 @@ public static class PropertyInfoExtensions
             0,
             ReflectionHelper.PublicInstanceBindingFlags,
             null,
-            new[] { typeof(int), itemType.Type },
+            [typeof(int), itemType.Type],
             null);
 
         if (insertMethod is null)

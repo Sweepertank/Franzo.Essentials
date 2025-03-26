@@ -93,7 +93,7 @@ public static class MemberInfoExtensions
         // https://stackoverflow.com/questions/288357/how-does-reflection-tell-me-when-a-property-is-hiding-an-inherited-member-with-t
         if (self.DeclaringType?.BaseType is null)
         {
-            return Array.Empty<MemberInfo>();
+            return [];
         }
 
         return self.DeclaringType.BaseType.GetMember(self.Name);

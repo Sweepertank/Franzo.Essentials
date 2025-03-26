@@ -13,7 +13,7 @@ public class DevirtualizationTask : Microsoft.Build.Utilities.Task
 
     public override bool Execute()
     {
-        var referencePaths = ReferencePath.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+        var referencePaths = ReferencePath.Split([';'], StringSplitOptions.RemoveEmptyEntries);
         using var assemblyResolver = new AssemblyResolver(this, referencePaths);
         using var module = ModuleDefinition.ReadModule(AssemblyPath, new ReaderParameters()
         {

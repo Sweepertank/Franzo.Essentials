@@ -18,7 +18,7 @@ public static class MethodInfoExtensions
             Expression.GetDelegateType(
                 self.GetParameters()
                 .Select(p => p.ParameterType)
-                .Concat(new[] { self.ReturnType })
+                .Concat([self.ReturnType])
                 .ToArray()),
             target);
     }

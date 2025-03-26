@@ -125,11 +125,10 @@ internal static class SymbolExtensions
     {
         // @todo: use expressions and create a delegate?
         // https://learn.microsoft.com/en-us/dotnet/api/system.linq.expressions.memberexpression?view=net-8.0
-        return (bool)ComparerEqualsMethod.Invoke(comparer, new[]
-        {
+        return (bool)ComparerEqualsMethod.Invoke(comparer, [
             a.UnderlyingSymbol(),
             b.UnderlyingSymbol()
-        });
+        ]);
     }
 
     private static object UnderlyingSymbol(this ISymbol self)
