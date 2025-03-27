@@ -142,4 +142,29 @@ public static class StringExtensions
     {
         return self.AsSpan().HasUnpairedSurrogates();
     }
+
+    public static TextFilePosition LastFilePosition(this string self)
+    {
+        if (self.EndsWith('\n'))
+        {
+            self = self[..(self.Length - 1)];
+        }
+
+        var offset = System.Math.Max(0, self.Length - 1);
+        int zeroBasedLine;
+        int zeroBasedColumn;
+        if (self.Contains('\n'))
+        {
+            (var beforeLastLineStr, var lastLine) = self.SliceAfterLast('\n');
+            zeroBasedLine = beforeLastLineStr.Count(c => c is '\n');
+            zeroBasedColumn = System.Math.Max(0, lastLine.Length - 1);
+        }
+        else
+        {
+            zeroBasedLine = 0;
+            zeroBasedColumn = offset;
+        }
+
+        return new TextFilePosition(zeroBasedLine, zeroBasedColumn, offset).ToOneBased();
+    }
 }
