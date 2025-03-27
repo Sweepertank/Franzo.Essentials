@@ -50,6 +50,12 @@ public partial interface ITypeResolver
         return TryResolveType(typeName, out type, out _, typeNameStyle);
     }
 
+    protected bool TryResolveTypeCore(
+        string typeName,
+        [NotNullWhen(true)] out Type? type,
+        ref Exception? error,
+        TypeNameStyle typeNameStyle = TypeNameStyle.Unspecified);
+
     // @todo fix once core.serialization is gone
     public sealed string ResolveTypeName(
         Type type,
@@ -57,17 +63,6 @@ public partial interface ITypeResolver
     {
         return ResolveTypeNameCore(type, style);
     }
-
-    public sealed TypeResolverSequence FollowedBy(ITypeResolver resolver)
-    {
-        return new TypeResolverSequence(this, resolver);
-    }
-
-    protected bool TryResolveTypeCore(
-        string typeName,
-        [NotNullWhen(true)] out Type? type,
-        ref Exception? error,
-        TypeNameStyle typeNameStyle = TypeNameStyle.Unspecified);
 
     protected string ResolveTypeNameCore(Type type, TypeNameStyle style)
     {
@@ -79,5 +74,10 @@ public partial interface ITypeResolver
                 => type.AssemblyQualifiedName ?? type.FullNameOrName(),
             _ => throw new ArgumentOutOfRangeException(nameof(style), style, null)
         };
+    }
+
+    public sealed TypeResolverSequence FollowedBy(ITypeResolver resolver)
+    {
+        return new TypeResolverSequence(this, resolver);
     }
 }

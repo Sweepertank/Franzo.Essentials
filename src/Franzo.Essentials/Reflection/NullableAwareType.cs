@@ -79,6 +79,13 @@ public class NullableAwareType
         return Equals(this, type);
     }
 
+    public static bool Equals(NullableAwareType a, NullableAwareType b)
+    {
+        return a.Type == b.Type
+            && a.IsNullable == b.IsNullable
+            && a.GenericTypeArguments.SequenceEqual(b.GenericTypeArguments);
+    }
+
     public override int GetHashCode()
     {
         // @todo: make better
@@ -88,23 +95,6 @@ public class NullableAwareType
     public static NullableAwareType Of<T>()
     {
         return NullableAwareTypeGetter<T>.Get();
-    }
-
-    public static bool Equals(NullableAwareType a, NullableAwareType b)
-    {
-        return a.Type == b.Type
-            && a.IsNullable == b.IsNullable
-            && a.GenericTypeArguments.SequenceEqual(b.GenericTypeArguments);
-    }
-
-    public static bool operator ==(NullableAwareType a, NullableAwareType b)
-    {
-        return Equals(a, b);
-    }
-
-    public static bool operator !=(NullableAwareType a, NullableAwareType b)
-    {
-        return !Equals(a, b);
     }
 
     internal static NullableAwareType Create(Type type, NullabilityInfo? nullabilityInfo = null)
@@ -166,6 +156,16 @@ public class NullableAwareType
         IEnumerable<NullableAwareType> genericTypeArguments)
     {
         return new NullableAwareType(type, isNullable, genericTypeArguments);
+    }
+
+    public static bool operator ==(NullableAwareType a, NullableAwareType b)
+    {
+        return Equals(a, b);
+    }
+
+    public static bool operator !=(NullableAwareType a, NullableAwareType b)
+    {
+        return !Equals(a, b);
     }
 
     private static class NullableAwareTypeGetter<T>

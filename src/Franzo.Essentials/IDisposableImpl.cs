@@ -18,11 +18,10 @@ public partial interface IDisposableImpl : IDisposable, ICheckIfDisposed, INotif
                 return;
             }
 
+            DisposeCore();
+            NotifyDisposed();
             IsDisposed = true;
         }
-
-        DisposeCore();
-        NotifyDisposed();
     }
 
     public new partial class Data_

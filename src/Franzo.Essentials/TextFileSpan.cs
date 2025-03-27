@@ -9,9 +9,18 @@ public readonly record struct TextFileSpan : IComparable<TextFileSpan>
         TextFilePosition.Start,
         0);
 
+    public static readonly TextFileSpan Null = new(
+        TextFilePosition.Null,
+        TextFilePosition.Null);
+
     public TextFilePosition Start { get; }
     public TextFilePosition End { get; }
     public int Width { get; }
+
+    public bool IsNull
+    {
+        get => Start.IsNull || End.IsNull;
+    }
 
     public TextFileSpan(
         TextFilePosition start,
