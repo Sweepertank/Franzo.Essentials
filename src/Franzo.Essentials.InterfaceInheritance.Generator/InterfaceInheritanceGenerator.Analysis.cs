@@ -18,14 +18,30 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
     private static void InitializeTypes_Phase1(InternalAnalysisContext cxt)
     {
-        foreach (var roslynType in cxt.PossiblyRelevantTopLevelRoslynTypes)
-        {
-            var x = roslynType.IsConstructedGenericType();
-            var type = CreateTypeIfEmitting(roslynType, null, cxt);
-            if (type is null) continue;
+        Parallel.ForEach(
+            cxt.PossiblyRelevantTopLevelRoslynTypes,
+            /*new ParallelOptions()
+            {
+                MaxDegreeOfParallelism = 1
+            },*/
+            (roslynType, state, _) =>
+            {
+                if (cxt.CancellationToken.IsCancellationRequested)
+                {
+                    state.Stop();
+                }
 
-            cxt.Data.RootTypesToEmit.Add(type);
-        }
+                //var x = roslynType.IsConstructedGenericType();
+                var type = CreateTypeIfEmitting(roslynType, null, cxt);
+                if (type is null) return;
+
+                lock (cxt.Data.RootTypesToEmitLock)
+                {
+                    cxt.Data.RootTypesToEmit.Add(type);
+                }
+            });
+
+        cxt.CancellationToken.ThrowIfCancellationRequested();
     }
 
     private static InternalTypeSymbol? CreateTypeIfEmitting(
@@ -61,20 +77,33 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
     private static void InitializeTypes_Phase2(InternalAnalysisContext cxt)
     {
-        foreach (var type in cxt.Data.TypesCreatedDuringTypeInitializationPhase1)
-        {
-            InitializeType_Phase2(type, cxt);
-        }
+        Parallel.ForEach(
+            cxt.Data.TypesCreatedDuringTypeInitializationPhase1,
+            /*new ParallelOptions()
+            {
+                MaxDegreeOfParallelism = 1
+            },*/
+            (type, state, _) =>
+            {
+                if (cxt.CancellationToken.IsCancellationRequested)
+                {
+                    state.Stop();
+                }
+
+                InitializeType_Phase2(type, cxt);
+            });
+
+        cxt.CancellationToken.ThrowIfCancellationRequested();
     }
 
     private static void InitializeType_Phase2(
         InternalTypeSymbol type,
         InternalAnalysisContext cxt)
     {
-        if (type.HasPhase2Initialized)
-        {
-            return;
-        }
+        //if (type.HasPhase2Initialized)
+        //{
+        //    return;
+        //}
 
         InitializeTypeBaseTypesAndColonSpecifiedInterfaces(type, cxt);
 
@@ -178,165 +207,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             }
         }
 
-        /*foreach (var attribute in type.RoslynSymbol.GetGenericAttributes(typeof(InheritInterfaceAttribute<>)))
-        {
-            var invalid = false;
-
-            if (type.IsDataClass)
-            {
-                cxt.ReportDiagnostic(
-                    Diagnostic.Create(DiagnosticDescriptors.Dummy, attribute.Location()));
-                invalid = true;
-            }
-
-            var typeArgument = attribute.AttributeClass?.TypeArguments.FirstOrDefault() as INamedTypeSymbol;
-            if (typeArgument is null)
-            {
-                invalid = true;
-            }
-
-            if (type.RoslynSymbol.TypeKind is not TypeKind.Class)
-            {
-                cxt.ReportDiagnostic(
-                    Diagnostic.Create(DiagnosticDescriptors.Dummy, attribute.Location()));
-                invalid = true;
-            }
-
-            if (!type.AreSelfAndContainingTypesPartiallyDeclared())
-            {
-                cxt.ReportDiagnostic(
-                    Diagnostic.Create(DiagnosticDescriptors.Dummy, attribute.Location()));
-                invalid = true;
-            }
-
-            if (typeArgument is not null)
-            {
-                if (typeArgument.TypeKind is not TypeKind.Interface)
-                {
-                    cxt.ReportDiagnostic(
-                        Diagnostic.Create(DiagnosticDescriptors.Dummy, attribute.Location()));
-                    invalid = true;
-                }
-
-                if (!type.RoslynSymbol.Interfaces.Contains(
-                    typeArgument,
-                    SymbolEqualityComparer.Default))
-                {
-                    cxt.ReportDiagnostic(
-                        Diagnostic.Create(DiagnosticDescriptors.Dummy, attribute.Location()));
-                    invalid = true;
-                }
-            }
-
-            if (invalid) continue;
-
-            var @interface = GetOrCreateType(
-                typeArgument!,
-                null,
-                AnalysisPhase.TypeInitializationPhase2,
-                cxt);
-
-            if (type.AttributeSpecifiedDirectInterfaces.Contains(@interface))
-            {
-                cxt.ReportDiagnostic(
-                    Diagnostic.Create(DiagnosticDescriptors.Dummy, attribute.Location()));
-                invalid = true;
-            }
-
-            if (invalid) continue;
-
-            type.AttributeSpecifiedDirectInterfaces.Add(@interface);
-        }
-
-        foreach (var attribute in type.RoslynSymbol.GetAttributes<InheritInterfaceAttribute>())
-        {
-            var invalid = false;
-
-            if (type.IsDataClass)
-            {
-                cxt.ReportDiagnostic(
-                    Diagnostic.Create(DiagnosticDescriptors.Dummy, attribute.Location()));
-                invalid = true;
-            }
-
-            INamedTypeSymbol? roslynInterface = null;
-            if (!attribute.TryGetReadableValueFromConstructorArgument<string>(
-                0,
-                out var interfaceName))
-            {
-                invalid = true;
-                cxt.ReportDiagnostic(
-                    Diagnostic.Create(DiagnosticDescriptors.Dummy, attribute.Location()));
-            }
-            else if (interfaceName is null)
-            {
-                cxt.ReportDiagnostic(
-                    Diagnostic.Create(DiagnosticDescriptors.Dummy, attribute.Location()));
-                invalid = true;
-            }
-            else if (!interfaceName.TryBindToType(
-                type.RoslynSymbol,
-                cxt.Compilation,
-                out var boundType))
-            {
-                cxt.ReportDiagnostic(
-                    Diagnostic.Create(DiagnosticDescriptors.Dummy, attribute.Location()));
-                invalid = true;
-            }
-            else if (boundType!.TypeKind is not TypeKind.Interface)
-            {
-                cxt.ReportDiagnostic(
-                    Diagnostic.Create(DiagnosticDescriptors.Dummy, attribute.Location()));
-                invalid = true;
-            }
-            else if (!type.RoslynSymbol.Interfaces.Contains(
-                boundType,
-                SymbolEqualityComparer.Default))
-            {
-                cxt.ReportDiagnostic(
-                    Diagnostic.Create(DiagnosticDescriptors.Dummy, attribute.Location()));
-                invalid = true;
-            }
-            else
-            {
-                roslynInterface = (INamedTypeSymbol)boundType;
-            }
-
-            if (type.RoslynSymbol.TypeKind is not TypeKind.Class)
-            {
-                cxt.ReportDiagnostic(
-                    Diagnostic.Create(DiagnosticDescriptors.Dummy, attribute.Location()));
-                invalid = true;
-            }
-
-            if (!type.AreSelfAndContainingTypesPartiallyDeclared())
-            {
-                cxt.ReportDiagnostic(
-                    Diagnostic.Create(DiagnosticDescriptors.Dummy, attribute.Location()));
-                invalid = true;
-            }
-
-            if (invalid) continue;
-
-            var @interface = GetOrCreateType(
-                roslynInterface!,
-                null,
-                AnalysisPhase.TypeInitializationPhase2,
-                cxt);
-
-            if (type.AttributeSpecifiedDirectInterfaces.Contains(@interface))
-            {
-                cxt.ReportDiagnostic(
-                    Diagnostic.Create(DiagnosticDescriptors.Dummy, attribute.Location()));
-                invalid = true;
-            }
-
-            if (invalid) continue;
-
-            type.AttributeSpecifiedDirectInterfaces.Add(@interface);
-        }*/
-
-        type.HasPhase2Initialized = true;
+        //type.HasPhase2Initialized = true;
     }
 
     private static void InitializeTypeBaseTypesAndColonSpecifiedInterfaces(
@@ -361,6 +232,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         // it prevents us from loading in interfaces that we don't care about
         // (i.e. interfaces whose only connection to types that we *do* care about
         // is the fact that they're colon-specified by a class that we care about)
+        // note: the above message is wrong and outdated
         //if (type.RoslynSymbol.TypeKind is TypeKind.Interface)
         //{
         foreach (var roslynInterface in type.RoslynSymbol.Interfaces)
@@ -379,20 +251,33 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
     private static void AnalyzeTypes_Phase1(InternalAnalysisContext cxt)
     {
-        foreach (var type in cxt.Data.TypesCreatedDuringTypeInitializationPhase1)
-        {
-            AnalyzeType_Phase1(type, cxt);
-        }
+        Parallel.ForEach(
+            cxt.Data.Types,
+            /*new ParallelOptions()
+            {
+                MaxDegreeOfParallelism = 1
+            },*/
+            (type, state, _) =>
+            {
+                if (cxt.CancellationToken.IsCancellationRequested)
+                {
+                    state.Stop();
+                }
+
+                AnalyzeType_Phase1(type, cxt);
+            });
+
+        cxt.CancellationToken.ThrowIfCancellationRequested();
     }
 
     private static void AnalyzeType_Phase1(
         InternalTypeSymbol type,
         InternalAnalysisContext cxt)
     {
-        if (type.HasPhase1Analyzed)
+        /*if (type.HasPhase1Analyzed)
         {
             return;
-        }
+        }*/
 
         foreach (var feature in type.DeclaredFeatures)
         {
@@ -405,7 +290,10 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                         cxt.Compilation)
                         && !feature.RoslynSymbol.IsImplicitlyDeclared)
                     {
-                        interfaceFeature.TypesDeclaringShadowingFeatures.Add(type);
+                        lock (interfaceFeature.TypesDeclaringShadowingFeaturesLock)
+                        {
+                            interfaceFeature.TypesDeclaringShadowingFeatures.Add(type);
+                        }
                     }
                 }
             }
@@ -474,7 +362,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             }
         }
 
-        if (type.BaseType is not null)
+        /*if (type.BaseType is not null)
         {
             AnalyzeType_Phase1(type.BaseType, cxt);
         }
@@ -482,9 +370,9 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         foreach (var @interface in type.DirectInterfaces)
         {
             AnalyzeType_Phase1(@interface, cxt);
-        }
+        }*/
 
-        type.HasPhase1Analyzed = true;
+        //type.HasPhase1Analyzed = true;
     }
 
     private static InternalTypeSymbol GetOrCreateType(
@@ -493,12 +381,15 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         AnalysisPhase phase,
         InternalAnalysisContext cxt)
     {
-        if (cxt.Data.TypesByRoslynType.TryGetValue(roslynType, out var type))
+        lock (cxt.Data.TypeCreationLock)
         {
-            return type;
-        }
+            if (cxt.Data.TypesByRoslynType.TryGetValue(roslynType, out var type))
+            {
+                return type;
+            }
 
-        return CreateType(roslynType, containingType, phase, cxt, false);
+            return CreateType(roslynType, containingType, phase, cxt, false);
+        }
     }
 
     private static InternalTypeSymbol CreateType(
@@ -540,7 +431,10 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         switch (phase)
         {
             case AnalysisPhase.TypeInitializationPhase1:
-                cxt.Data.TypesCreatedDuringTypeInitializationPhase1.Add(type);
+                lock (cxt.Data.TypeCreationLock)
+                {
+                    cxt.Data.TypesCreatedDuringTypeInitializationPhase1.Add(type);
+                }
                 break;
             case AnalysisPhase.TypeInitializationPhase2:
                 if ((!roslynType.ContainingAssembly.CorrectEquals(cxt.Compilation.Assembly)
@@ -572,11 +466,17 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                     }
                 }
 
-                cxt.Data.TypesCreatedDuringTypeInitializationPhase2.Add(type);
+                lock (cxt.Data.TypeCreationLock)
+                {
+                    cxt.Data.TypesCreatedDuringTypeInitializationPhase2.Add(type);
+                }
                 break;
         };
 
-        cxt.Data.TypesByRoslynType[roslynType] = type;
+        lock (cxt.Data.TypeCreationLock)
+        {
+            cxt.Data.TypesByRoslynType[roslynType] = type;
+        }
 
         return type;
     }

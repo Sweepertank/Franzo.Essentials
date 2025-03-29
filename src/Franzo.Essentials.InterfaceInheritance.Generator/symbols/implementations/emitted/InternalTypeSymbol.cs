@@ -8,9 +8,9 @@ internal class InternalTypeSymbol : InternalSymbol, IInternalTypeSymbol
     public readonly InternalTypeSymbol? ContainingType;
     public InternalTypeSymbol? BaseType = null;
     public bool? CachedAreSelfAndContainingTypesPartiallyDeclared = null;
-    public bool HasPhase2Initialized = false;
+    //public bool HasPhase2Initialized = false;
     //public bool HasInitializedBaseTypesAndInterfaces = false;
-    public bool HasPhase1Analyzed = false;
+    //public bool HasPhase1Analyzed = false;
     public List<InternalTypeSymbol> DeclaredTypes = new();
     public List<InternalTypeSymbol> ColonSpecifiedDirectInterfaces = new();
     public List<InternalFeatureSymbol> SourceDeclaredFeatures = new();

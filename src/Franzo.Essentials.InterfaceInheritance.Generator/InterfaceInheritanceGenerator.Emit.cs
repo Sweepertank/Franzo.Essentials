@@ -18,8 +18,13 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
         Parallel.ForEach(
             cxt.AnalysisData.RootTypesToEmit,
-            (type, _, _) =>
+            (type, state, _) =>
             {
+                if (cxt.SourceProductionContext.CancellationToken.IsCancellationRequested)
+                {
+                    state.Stop();
+                }
+
                 var sb = new StringBuilder();
                 var emissionCxt = new TypeEmissionContext(
                     cxt,
@@ -49,6 +54,8 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                     count++;
                 }
             });
+
+        cxt.SourceProductionContext.CancellationToken.ThrowIfCancellationRequested();
     }
 
     private static void EmitTypeWithNamespaceDeclaration(

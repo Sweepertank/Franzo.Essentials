@@ -6,6 +6,7 @@ namespace Franzo.Essentials.InterfaceInheritance.Generator;
 
 internal abstract class InternalAnalysisContext
 {
+    public abstract CancellationToken CancellationToken { get; }
     public abstract CSharpCompilation Compilation { get; }
     public abstract ImmutableHashSet<INamedTypeSymbol> PossiblyRelevantTopLevelRoslynTypes { get; }
     public abstract AnalysisData Data { get; }

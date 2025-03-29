@@ -6,7 +6,14 @@ namespace Franzo.Essentials.InterfaceInheritance.Generator;
 
 internal class GenerationInternalAnalysisContext : InternalAnalysisContext
 {
+    private readonly object _diagnosticReportingLock = new();
+
     public Context InnerContext { get; }
+
+    public override CancellationToken CancellationToken
+    {
+        get => InnerContext.SourceProductionContext.CancellationToken;
+    }
 
     public override CSharpCompilation Compilation
     {
@@ -30,6 +37,9 @@ internal class GenerationInternalAnalysisContext : InternalAnalysisContext
 
     public override void ReportDiagnostic(Diagnostic diagnostic)
     {
-        InnerContext.SourceProductionContext.ReportDiagnostic(diagnostic);
+        lock (_diagnosticReportingLock)
+        {
+            InnerContext.SourceProductionContext.ReportDiagnostic(diagnostic);
+        }
     }
 }

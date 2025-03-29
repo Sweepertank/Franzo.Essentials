@@ -12,4 +12,9 @@ internal abstract class InternalSymbol : IInternalSymbol
         RoslynSymbol = roslynSymbol;
         Context = cxt;
     }
+
+    public override string ToString()
+    {
+        return RoslynSymbol.ToString();
+    }
 }
