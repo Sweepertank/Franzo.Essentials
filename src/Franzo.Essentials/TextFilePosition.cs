@@ -5,16 +5,16 @@ namespace Franzo.Essentials;
 public readonly record struct TextFilePosition : IComparable<TextFilePosition>
 {
     public static readonly TextFilePosition Start = new(1, 1, 0);
-    public static readonly TextFilePosition Null = new(-1, -1, 0);
+    //public static readonly TextFilePosition Sentinel = new(-1, -1, 0);
 
     public int Line { get; }
     public int Column { get; }
     public int Offset { get; }
 
-    public bool IsNull
-    {
-        get => Line < 0 || Column < 0;
-    }
+    //public bool IsSentinel
+    //{
+    //    get => Line < 0 || Column < 0;
+    //}
 
     public TextFilePosition(int line, int column, int offset = -1)
     {
