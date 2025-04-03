@@ -44,13 +44,13 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
                 EmitTypeWithNamespaceDeclaration(type, emissionCxt);
 
-                var s = sb.ToString();
+                var str = sb.ToString();
 
                 lock (lk)
                 {
                     cxt.SourceProductionContext.AddSource(
                         $"{type.RoslynSymbol.ToNamespaceQualifiedFileSystemDisplayString()}.cs",
-                        s);
+                        str);
                     count++;
                 }
             });

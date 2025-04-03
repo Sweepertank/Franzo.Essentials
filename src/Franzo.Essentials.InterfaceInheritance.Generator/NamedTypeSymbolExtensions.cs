@@ -38,7 +38,7 @@ internal static class NamedTypeSymbolExtensions
 
     public static string MemberifiedName(this INamedTypeSymbol self)
     {
-        var s = self.Name.WithoutInterfaceI();
+        var str = self.Name.WithoutInterfaceI();
 
         if (self.TypeArguments.Length > 0)
         {
@@ -58,16 +58,16 @@ internal static class NamedTypeSymbolExtensions
 
             sb.Append("__");
 
-            s += sb.ToString();
+            str += sb.ToString();
         }
 
         if (self.ContainingType is not null)
         {
-            s = self.ContainingType.ToDisplayString(TypeQualifiedWithTypeParametersFormat).MangleSymbolName()
+            str = self.ContainingType.ToDisplayString(TypeQualifiedWithTypeParametersFormat).MangleSymbolName()
                 + "_"
-                + s;
+                + str;
         }
 
-        return s;
+        return str;
     }
 }
