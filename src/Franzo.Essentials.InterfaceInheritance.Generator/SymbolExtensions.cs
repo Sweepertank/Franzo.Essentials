@@ -93,6 +93,11 @@ internal static class SymbolExtensions
         return Compare(DuplicateSourceComparer, self, otherMember);
     }
 
+    public static bool IsGeneric(this ISymbol self)
+    {
+        return self.TypeParameters().Count() > 0;
+    }
+
     public static bool IsProtectedOrProtectedAndOrInternal(this ISymbol self)
     {
         return self.DeclaredAccessibility
@@ -114,11 +119,11 @@ internal static class SymbolExtensions
         return self.ToDisplayString(FullyQualifiedWithoutGlobalNamespaceFormat).MangleSymbolName();
     }
 
-    public static bool IsProtectedOrProtectedAndOrInternalAndOriginalDefinitionIsGenericTypeContained(
+    public static bool IsProtectedOrProtectedAndOrInternalAndGenericOrOriginalDefinitionIsGenericTypeContained(
         this ISymbol self)
     {
         return self.IsProtectedOrProtectedAndOrInternal()
-            && self.OriginalDefinition.ContainingType.IsGenericType;
+            && (self.IsGeneric() || self.OriginalDefinition.ContainingType.IsGenericType);
     }
 
     private static bool Compare(object comparer, ISymbol a, ISymbol b)

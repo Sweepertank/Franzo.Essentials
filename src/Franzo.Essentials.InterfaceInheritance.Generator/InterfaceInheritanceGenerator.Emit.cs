@@ -978,7 +978,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             cxt.Writer.WriteBracedSectionStart();
 
             if (property.RoslynSymbol.IsProtectedOrProtectedAndOrInternal()
-                && !property.RoslynSymbol.IsProtectedOrProtectedAndOrInternalAndOriginalDefinitionIsGenericTypeContained())
+                && !property.RoslynSymbol.IsProtectedOrProtectedAndOrInternalAndGenericOrOriginalDefinitionIsGenericTypeContained())
             {
                 EmitUnsafeGetterAccessorForProperty(property.RoslynSymbol, declaringType, cxt);
             }
@@ -987,7 +987,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
             if (property.RoslynSymbol.IsProtectedOrProtectedAndOrInternal())
             {
-                if (property.RoslynSymbol.IsProtectedOrProtectedAndOrInternalAndOriginalDefinitionIsGenericTypeContained())
+                if (property.RoslynSymbol.IsProtectedOrProtectedAndOrInternalAndGenericOrOriginalDefinitionIsGenericTypeContained())
                 {
                     EmitUnsafeAccessorClassQualification(
                         property.RoslynSymbol.GetMethod,
@@ -1023,7 +1023,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
             if (property.RoslynSymbol.SetMethod.IsProtectedOrProtectedAndOrInternal())
             {
-                if (property.RoslynSymbol.SetMethod.IsProtectedOrProtectedAndOrInternalAndOriginalDefinitionIsGenericTypeContained())
+                if (property.RoslynSymbol.SetMethod.IsProtectedOrProtectedAndOrInternalAndGenericOrOriginalDefinitionIsGenericTypeContained())
                 {
                     EmitUnsafeAccessorClassQualification(
                         property.RoslynSymbol.SetMethod,
@@ -1052,13 +1052,13 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         cxt.Writer.WriteBracedSectionEnd();
 
         if (property.RoslynSymbol.GetMethod is not null
-            && property.RoslynSymbol.IsProtectedOrProtectedAndOrInternalAndOriginalDefinitionIsGenericTypeContained())
+            && property.RoslynSymbol.IsProtectedOrProtectedAndOrInternalAndGenericOrOriginalDefinitionIsGenericTypeContained())
         {
             EmitUnsafeGetterAccessorClassForProperty(property.RoslynSymbol, declaringType, cxt);
         }
 
         if (property.RoslynSymbol.SetMethod is not null
-            && property.RoslynSymbol.SetMethod.IsProtectedOrProtectedAndOrInternalAndOriginalDefinitionIsGenericTypeContained())
+            && property.RoslynSymbol.SetMethod.IsProtectedOrProtectedAndOrInternalAndGenericOrOriginalDefinitionIsGenericTypeContained())
         {
             EmitUnsafeSetterAccessorClassForProperty(property.RoslynSymbol, declaringType, cxt);
         }
@@ -1145,7 +1145,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             }
             else
             {
-                if (field.RoslynSymbol.IsProtectedOrProtectedAndOrInternalAndOriginalDefinitionIsGenericTypeContained())
+                if (field.RoslynSymbol.IsProtectedOrProtectedAndOrInternalAndGenericOrOriginalDefinitionIsGenericTypeContained())
                 {
                     EmitUnsafeAccessorClassQualification(field.RoslynSymbol, declaringType, cxt);
                 }
@@ -1166,7 +1166,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
         if (field.RoslynSymbol.IsProtectedOrProtectedAndOrInternal() && !field.RoslynSymbol.IsConst)
         {
-            if (field.RoslynSymbol.IsProtectedOrProtectedAndOrInternalAndOriginalDefinitionIsGenericTypeContained())
+            if (field.RoslynSymbol.IsProtectedOrProtectedAndOrInternalAndGenericOrOriginalDefinitionIsGenericTypeContained())
             {
                 EmitUnsafeAccessorClassForField(field.RoslynSymbol, declaringType, cxt);
             }
@@ -1201,7 +1201,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
             if (@event.RoslynSymbol.IsProtectedOrProtectedAndOrInternal())
             {
-                if (@event.RoslynSymbol.IsProtectedOrProtectedAndOrInternalAndOriginalDefinitionIsGenericTypeContained())
+                if (@event.RoslynSymbol.IsProtectedOrProtectedAndOrInternalAndGenericOrOriginalDefinitionIsGenericTypeContained())
                 {
                     EmitUnsafeAccessorClassQualification(
                         @event.RoslynSymbol.AddMethod,
@@ -1239,7 +1239,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
             if (@event.RoslynSymbol.IsProtectedOrProtectedAndOrInternal())
             {
-                if (@event.RoslynSymbol.IsProtectedOrProtectedAndOrInternalAndOriginalDefinitionIsGenericTypeContained())
+                if (@event.RoslynSymbol.IsProtectedOrProtectedAndOrInternalAndGenericOrOriginalDefinitionIsGenericTypeContained())
                 {
                     EmitUnsafeAccessorClassQualification(
                         @event.RoslynSymbol.RemoveMethod,
@@ -1270,13 +1270,13 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         cxt.Writer.WriteBracedSectionEnd();
 
         if (@event.RoslynSymbol.AddMethod is not null
-            && @event.RoslynSymbol.IsProtectedOrProtectedAndOrInternalAndOriginalDefinitionIsGenericTypeContained())
+            && @event.RoslynSymbol.IsProtectedOrProtectedAndOrInternalAndGenericOrOriginalDefinitionIsGenericTypeContained())
         {
             EmitUnsafeAddMethodAccessorClassForEvent(@event.RoslynSymbol, declaringType, cxt);
         }
 
         if (@event.RoslynSymbol.RemoveMethod is not null
-            && @event.RoslynSymbol.IsProtectedOrProtectedAndOrInternalAndOriginalDefinitionIsGenericTypeContained())
+            && @event.RoslynSymbol.IsProtectedOrProtectedAndOrInternalAndGenericOrOriginalDefinitionIsGenericTypeContained())
         {
             EmitUnsafeRemoveMethodAccessorClassForEvent(@event.RoslynSymbol, declaringType, cxt);
         }
@@ -1294,7 +1294,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         cxt.Writer.WriteBracedSectionStart();
 
         if (method.RoslynSymbol.IsProtectedOrProtectedAndOrInternal()
-            && !method.RoslynSymbol.IsProtectedOrProtectedAndOrInternalAndOriginalDefinitionIsGenericTypeContained())
+            && !method.RoslynSymbol.IsProtectedOrProtectedAndOrInternalAndGenericOrOriginalDefinitionIsGenericTypeContained())
         {
             EmitUnsafeAccessorForMethod(method.RoslynSymbol, declaringType, cxt);
         }
@@ -1306,7 +1306,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
         if (method.RoslynSymbol.IsProtectedOrProtectedAndOrInternal())
         {
-            if (method.RoslynSymbol.IsProtectedOrProtectedAndOrInternalAndOriginalDefinitionIsGenericTypeContained())
+            if (method.RoslynSymbol.IsProtectedOrProtectedAndOrInternalAndGenericOrOriginalDefinitionIsGenericTypeContained())
             {
                 EmitUnsafeAccessorClassQualification(method.RoslynSymbol, declaringType, cxt);
             }
@@ -1347,7 +1347,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
         cxt.Writer.WriteBracedSectionEnd();
 
-        if (method.RoslynSymbol.IsProtectedOrProtectedAndOrInternalAndOriginalDefinitionIsGenericTypeContained())
+        if (method.RoslynSymbol.IsProtectedOrProtectedAndOrInternalAndGenericOrOriginalDefinitionIsGenericTypeContained())
         {
             EmitUnsafeAccessorClassForMethod(method.RoslynSymbol, declaringType, cxt);
         }
