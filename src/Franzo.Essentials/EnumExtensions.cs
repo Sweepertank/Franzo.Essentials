@@ -5,7 +5,7 @@ public static class EnumExtensions
     /*public static Enum UnsetFlag(this Enum self, Enum flag)
     {
     }*/
-    public static T WithFlags<T>(this T self, T flags) where T : struct, Enum
+    /*public static T WithFlags<T>(this T self, T flags) where T : struct, Enum
     {
         var intSelf = (int)(object)self;
         var intFlags = (int)(object)flags;
@@ -17,7 +17,7 @@ public static class EnumExtensions
         var intSelf = (int)(object)self;
         var intFlags = (int)(object)flag;
         return (T)(object)(intSelf & ~intFlags);
-    }
+    }*/
 
     public static IEnumerable<T> Flags<T>(this T self) where T : struct, Enum
     {
