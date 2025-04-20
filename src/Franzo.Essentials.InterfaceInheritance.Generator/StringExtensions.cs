@@ -49,6 +49,7 @@ internal static class StringExtensions
         return str.Replace('.', '_')
             .Replace("<", "__")
             .Replace(">", "__")
-            .Replace(", ", "_");
+            .Replace(", ", "_")
+            .Replace("?", "Question");
     }
 }
