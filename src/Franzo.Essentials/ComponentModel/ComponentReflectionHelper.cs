@@ -6,14 +6,9 @@ namespace Franzo.Essentials.ComponentModel;
 
 public static class ComponentReflectionHelper
 {
-    private static readonly MethodInfo s_createGetterPrivateMethod =
-        typeof(ComponentReflectionHelper).GetMethodOrThrow(
-            nameof(CreateGetterGeneric),
-            BindingFlags.Static | BindingFlags.NonPublic);
-
     public static object? CallGetMethod(object? target, MethodInfo getMethod)
     {
-        var getter = CreateGetter(getMethod);
+        var getter = getMethod.CreateFastGetter<object?>();
         try
         {
             return getter.Invoke(target);
@@ -58,47 +53,6 @@ public static class ComponentReflectionHelper
         });
     }
 
-    private static Getter CreateGetter(MethodInfo getMethod)
-    {
-        // https://stackoverflow.com/questions/2490828/createdelegate-with-unknown-types
-
-        if (getMethod.DeclaringType is null)
-        {
-            throw new ArgumentException();
-        }
-        else if (getMethod.GetParameters().Length != 0)
-        {
-            throw new ArgumentException();
-        }
-
-        var method = s_createGetterPrivateMethod.MakeGenericMethod(
-            getMethod.DeclaringType,
-            getMethod.ReturnType);
-        var createdDelegate = method.Invoke(
-            null,
-            [getMethod])!;
-
-        return (Getter)createdDelegate;
-    }
-
-    private static Getter CreateGetterGeneric<TTarget, TReturn>(MethodInfo getMethod)
-    {
-        var del = (Func<TTarget, TReturn>)Delegate.CreateDelegate(
-            typeof(Func<TTarget, TReturn>),
-            null,
-            getMethod);
-
-        return target =>
-        {
-            if (target is not TTarget instance)
-            {
-                throw new ArgumentException();
-            }
-
-            return del.Invoke(instance);
-        };
-    }
-
     private static Setter CreateSetter(MethodInfo setMethod)
     {
         // https://stackoverflow.com/questions/10820453/reflection-performance-create-delegate-properties-c
@@ -124,6 +78,5 @@ public static class ComponentReflectionHelper
         return expr.Compile();
     }
 
-    private delegate object? Getter(object? instance);
     private delegate void Setter(object? instance, object? value);
 }

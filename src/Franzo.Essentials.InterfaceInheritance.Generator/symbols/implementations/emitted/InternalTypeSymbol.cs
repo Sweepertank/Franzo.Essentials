@@ -1,3 +1,4 @@
+using Franzo.Essentials.Collections;
 using Franzo.Essentials.Roslyn;
 using Microsoft.CodeAnalysis;
 
@@ -13,6 +14,9 @@ internal class InternalTypeSymbol : InternalSymbol, IInternalTypeSymbol
     //public bool HasPhase1Analyzed = false;
     public List<InternalTypeSymbol> DeclaredTypes = new();
     public List<InternalTypeSymbol> ColonSpecifiedDirectInterfaces = new();
+    public List<InternalTypeSymbol> InterfacesList = new();
+    public bool HasComputedInterfacesList = false;
+    public object InterfacesListComputationLock = new();
     public List<InternalFeatureSymbol> SourceDeclaredFeatures = new();
     public InternalTypeSymbol? DataClass = null;
     public bool IsDataClass = false;
@@ -69,7 +73,12 @@ internal class InternalTypeSymbol : InternalSymbol, IInternalTypeSymbol
 
     public IEnumerable<InternalTypeSymbol> Interfaces
     {
-        get => DirectInterfaces.Concat(DirectInterfaces.SelectMany(i => i.Interfaces)).Distinct();
+        get
+        {
+            ComputeInterfacesList();
+            return InterfacesList;
+            //DirectInterfaces.Concat(DirectInterfaces.SelectMany(i => i.Interfaces)).Distinct();
+        }
     }
 
     public IEnumerable<InternalTypeSymbol> SelfAndInterfaces
@@ -107,5 +116,53 @@ internal class InternalTypeSymbol : InternalSymbol, IInternalTypeSymbol
     {
         return CachedAreSelfAndContainingTypesPartiallyDeclared
             ?? RoslynSymbol.AreSelfAndContainingTypesPartiallyDeclared();
+    }
+
+    private void ComputeInterfacesList()
+    {
+        lock (InterfacesListComputationLock)
+        {
+            if (HasComputedInterfacesList)
+            {
+                return;
+            }
+
+            ComputeInterfacesListCore();
+            HasComputedInterfacesList = true;
+        }
+    }
+
+    private void ComputeInterfacesListCore()
+    {
+        var encounteredInterfaces = new HashSet<InternalTypeSymbol>();
+        var queue = new Queue<InternalTypeSymbol>();
+        queue.EnqueueRange(DirectInterfaces);
+        while (queue.Count > 0)
+        {
+            var @interface = queue.Dequeue();
+            if (encounteredInterfaces.Contains(@interface))
+            {
+                continue;
+            }
+
+            InterfacesList.Add(@interface);
+            queue.EnqueueRange(@interface.DirectInterfaces);
+            encounteredInterfaces.Add(@interface);
+        }
+
+        /*var encounteredInterfaces = new HashSet<InternalTypeSymbol>();
+        foreach (var directInterface in DirectInterfaces)
+        {
+            foreach (var @interface in directInterface.SelfAndInterfaces)
+            {
+                if (encounteredInterfaces.Contains(@interface))
+                {
+                    continue;
+                }
+
+                InterfacesList.Add(@interface);
+                encounteredInterfaces.Add(@interface);
+            }
+        }*/
     }
 }

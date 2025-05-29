@@ -1,6 +1,6 @@
 namespace Franzo.Essentials.Roslyn;
 
-public static class CircumventedEnvironment
+public static class JohnLockeEnvironment
 {
     public static int ProcessorCount
     {

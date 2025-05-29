@@ -117,7 +117,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             cxt.Writer.Write(" : ");
             cxt.Writer.Write(typeof(InterfaceData).GloballyQualifiedName());
             //cxt.Writer.Write("<");
-            //cxt.Writer.Write(type.ContainingType!.RoslynSymbol.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
+            //cxt.Writer.Write(type.ContainingType!.RoslynSymbol.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
             //cxt.Writer.Write(">");
         }
         /*else if (type.RoslynSymbol.TypeKind.IsClassOrStruct())
@@ -174,13 +174,15 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             cxt.Writer.WriteLine();
 
             cxt.Writer.Write("private ");
-            cxt.Writer.Write(type.ContainingType!.RoslynSymbol.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
+            cxt.Writer.Write(
+                type.ContainingType!.RoslynSymbol.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
             cxt.Writer.Write(" ");
             cxt.Writer.Write(nameof(InterfaceData.This));
             cxt.Writer.WriteLine();
             cxt.Writer.WriteBracedSectionStart();
             cxt.Writer.Write("get => (");
-            cxt.Writer.Write(type.ContainingType!.RoslynSymbol.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
+            cxt.Writer.Write(
+                type.ContainingType!.RoslynSymbol.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
             cxt.Writer.Write(")");
             cxt.Writer.Write("base.");
             cxt.Writer.Write(nameof(InterfaceData.This));
@@ -223,7 +225,8 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             }
 
             cxt.Writer.Write("public ");
-            cxt.Writer.Write(type.DataClass.RoslynSymbol.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
+            cxt.Writer.Write(
+                type.DataClass.RoslynSymbol.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
             cxt.Writer.Write(" ");
             cxt.Writer.Write(GeneratedInterfaceDataPropertyName);
             cxt.Writer.Write(" { get; }");
@@ -243,7 +246,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                         || feature.RoslynSymbol.DeclaredAccessibility is Accessibility.Protected
                         || (feature.RoslynSymbol.DeclaredAccessibility is Accessibility.ProtectedAndInternal
                             && feature.RoslynSymbol.ContainingAssembly.GivesAccessTo(
-                                    type.RoslynSymbol.ContainingAssembly)))
+                                type.RoslynSymbol.ContainingAssembly)))
                         || feature.RoslynSymbol is IMethodSymbol
                         {
                             MethodKind: MethodKind.PropertyGet
@@ -283,12 +286,8 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                     // other places probably have similar redundancies too
                     if (feature.TypesDeclaringShadowingFeatures.Any(
                         shadowingType => type.RoslynSymbol.IsAssignableTo(
-                                shadowingType.RoslynSymbol,
-                                cxt.MainContext.Compilation)
-                            || type.DirectInterfaces.Any(
-                                i => i.RoslynSymbol.IsAssignableTo(
-                                    shadowingType.RoslynSymbol,
-                                    cxt.MainContext.Compilation))))
+                            shadowingType.RoslynSymbol,
+                            cxt.MainContext.Compilation)))
                     {
                         continue;
                     }
@@ -360,7 +359,8 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             if (@interface.DataClass is null) continue;
 
             cxt.Writer.Write("private ");
-            cxt.Writer.Write(@interface.RoslynSymbol.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
+            cxt.Writer.Write(
+                @interface.RoslynSymbol.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
             cxt.Writer.Write(".");
             cxt.Writer.Write(InterfaceDataClassName);
             cxt.Writer.Write(" ");
@@ -369,11 +369,13 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
             cxt.Writer.Indent++;
             cxt.Writer.Write("= (");
-            cxt.Writer.Write(@interface.RoslynSymbol.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
+            cxt.Writer.Write(
+                @interface.RoslynSymbol.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
             cxt.Writer.Write(".");
             cxt.Writer.Write(InterfaceDataClassName);
             cxt.Writer.Write(")global::System.Runtime.CompilerServices.RuntimeHelpers.GetUninitializedObject(typeof(");
-            cxt.Writer.Write(@interface.RoslynSymbol.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
+            cxt.Writer.Write(
+                @interface.RoslynSymbol.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
             cxt.Writer.Write(".");
             cxt.Writer.Write(InterfaceDataClassName);
             cxt.Writer.Write("));");
@@ -385,11 +387,13 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         {
             if (@interface.DataClass is null) continue;
 
-            cxt.Writer.Write(@interface.RoslynSymbol.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
+            cxt.Writer.Write(
+                @interface.RoslynSymbol.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
             cxt.Writer.Write(".");
             cxt.Writer.Write(InterfaceDataClassName);
             cxt.Writer.Write(" ");
-            cxt.Writer.Write(@interface.RoslynSymbol.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
+            cxt.Writer.Write(
+                @interface.RoslynSymbol.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
             cxt.Writer.Write(".");
             cxt.Writer.Write(GeneratedInterfaceDataPropertyName);
             cxt.Writer.WriteLine();
@@ -408,9 +412,10 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         TypeEmissionContext cxt)
     {
         cxt.Writer.Write("private ");
-        cxt.Writer.Write(@interface.RoslynSymbol.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
+        cxt.Writer.Write(
+            @interface.RoslynSymbol.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
         cxt.Writer.Write(" As");
-        cxt.Writer.Write(@interface.RoslynSymbol.MemberifiedName());
+        cxt.Writer.Write(@interface.RoslynSymbol.MemberifiedName(cxt));
         cxt.Writer.Write("()");
         cxt.Writer.WriteLine();
         cxt.Writer.WriteBracedSectionStart();
@@ -427,7 +432,8 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             if (@interface.DataClass is null) continue;
 
             cxt.Writer.Write("private ");
-            cxt.Writer.Write(@interface.RoslynSymbol.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
+            cxt.Writer.Write(
+                @interface.RoslynSymbol.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
             cxt.Writer.Write(".");
             cxt.Writer.Write(InterfaceDataClassName);
             cxt.Writer.Write(" ");
@@ -441,7 +447,8 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             if (@interface.DataClass is null) continue;
 
             cxt.Writer.Write("private ");
-            cxt.Writer.Write(@interface.RoslynSymbol.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
+            cxt.Writer.Write(
+                @interface.RoslynSymbol.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
             cxt.Writer.Write(".");
             cxt.Writer.Write(InterfaceDataClassName);
             cxt.Writer.Write(" ");
@@ -457,7 +464,8 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             if (type.IsDataClass)
             {
                 cxt.Writer.Write("((");
-                cxt.Writer.Write(@interface.RoslynSymbol.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
+                cxt.Writer.Write(
+                    @interface.RoslynSymbol.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
                 cxt.Writer.Write(")");
                 cxt.Writer.Write(nameof(InterfaceData.This));
                 cxt.Writer.Write(").");
@@ -489,7 +497,8 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             // @todo: remove string interpolations if needed for perf
 
             // @todo: create delegate and invoke that instead
-            cxt.Writer.Write(@interface.RoslynSymbol.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
+            cxt.Writer.Write(
+                @interface.RoslynSymbol.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
             cxt.Writer.Write(".");
             cxt.Writer.Write(InterfaceDataClassName);
             cxt.Writer.Write(".");
@@ -498,7 +507,8 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             if (type.IsDataClass)
             {
                 cxt.Writer.Write("((");
-                cxt.Writer.Write(@interface.RoslynSymbol.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
+                cxt.Writer.Write(
+                    @interface.RoslynSymbol.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
                 cxt.Writer.Write(")");
                 cxt.Writer.Write(nameof(InterfaceData.This));
                 cxt.Writer.Write(").");
@@ -528,7 +538,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         InternalTypeSymbol @interface,
         TypeEmissionContext cxt)
     {
-        cxt.Writer.Write(@interface.RoslynSymbol.MemberifiedName());
+        cxt.Writer.Write(@interface.RoslynSymbol.MemberifiedName(cxt));
         cxt.Writer.Write(DataString);
     }
 
@@ -537,7 +547,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         TypeEmissionContext cxt)
     {
         cxt.Writer.Write("Construct");
-        cxt.Writer.Write(@interface.RoslynSymbol.MemberifiedName());
+        cxt.Writer.Write(@interface.RoslynSymbol.MemberifiedName(cxt));
     }
 
     private static void EmitRealDataFieldName(
@@ -644,7 +654,8 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
     private static void EmitAttribute(AttributeData attribute, TypeEmissionContext cxt)
     {
         cxt.Writer.Write("[");
-        cxt.Writer.Write(attribute.AttributeClass!.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
+        cxt.Writer.Write(
+            attribute.AttributeClass!.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
         cxt.Writer.Write("(");
 
         foreach ((var argument, var last) in attribute.ConstructorArguments.WithLastFlag())
@@ -701,7 +712,8 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
         var arrayType = (IArrayTypeSymbol)self.Type!;
         cxt.Writer.Write("new ");
-        cxt.Writer.Write(arrayType.ElementType.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
+        cxt.Writer.Write(
+            arrayType.ElementType.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
         cxt.Writer.Write("[] { ");
         EmitCommaSeparatedTypedConstants(self.Values, cxt);
         cxt.Writer.Write(" }");
@@ -770,7 +782,8 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             }
         }
 
-        cxt.Writer.Write(enumType.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
+        cxt.Writer.Write(
+            enumType.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
         cxt.Writer.Write(".");
         cxt.Writer.Write(matchingField.Name);
     }
@@ -781,7 +794,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
     {
         var type = (INamedTypeSymbol)typedConstant.Value!;
         cxt.Writer.Write("typeof(");
-        cxt.Writer.Write(type.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
+        cxt.Writer.Write(type.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
         cxt.Writer.Write(")");
     }
 
@@ -825,7 +838,8 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                 cxt.Writer.Write(" ");
             }
 
-            cxt.Writer.Write(parameter.Type.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
+            cxt.Writer.Write(
+                parameter.Type.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
             cxt.Writer.Write(" ");
 
             if (isForUnsafeAccessor)
@@ -934,12 +948,14 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
     {
         if (feature.RoslynSymbol.IsStatic)
         {
-            cxt.Writer.Write(declaringType.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
+            cxt.Writer.Write(
+                declaringType.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
         }
         else
         {
             cxt.Writer.Write("((");
-            cxt.Writer.Write(declaringType.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
+            cxt.Writer.Write(
+                declaringType.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
             cxt.Writer.Write(")this)");
         }
     }
@@ -950,7 +966,8 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         INamedTypeSymbol withinType,
         TypeEmissionContext cxt)
     {
-        cxt.Writer.Write(property.RoslynSymbol.Type.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
+        cxt.Writer.Write(
+            property.RoslynSymbol.Type.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
         cxt.Writer.Write(" ");
         if (property.RoslynSymbol.IsIndexer)
         {
@@ -1132,7 +1149,8 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         {
             cxt.Writer.Write("const ");
         }
-        cxt.Writer.Write(field.RoslynSymbol.Type.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
+        cxt.Writer.Write(
+            field.RoslynSymbol.Type.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
         cxt.Writer.Write(" ");
         cxt.Writer.Write(field.RoslynSymbol.Name);
         cxt.Writer.Write(" = ");
@@ -1184,7 +1202,8 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         TypeEmissionContext cxt)
     {
         cxt.Writer.Write("event ");
-        cxt.Writer.Write(@event.RoslynSymbol.Type.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
+        cxt.Writer.Write(
+            @event.RoslynSymbol.Type.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
         cxt.Writer.Write(" ");
         cxt.Writer.Write(@event.RoslynSymbol.Name);
         cxt.Writer.WriteLine();
@@ -1360,7 +1379,8 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         TypeEmissionContext cxt,
         bool isForUnsafeAccessor = false)
     {
-        cxt.Writer.Write(method.ReturnType.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
+        cxt.Writer.Write(
+            method.ReturnType.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
         cxt.Writer.Write(" ");
         /*if (isForUnsafeAccessor)
         {
@@ -1374,7 +1394,8 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         cxt.Writer.Write("(");
         if (isForUnsafeAccessor)
         {
-            cxt.Writer.Write(declaringType.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
+            cxt.Writer.Write(
+                declaringType.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
             cxt.Writer.Write(" c");
             if (method.Parameters.Length > 0)
             {
@@ -1408,7 +1429,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             cxt.Writer.Write(typeParameter.Name);
             cxt.Writer.Write(" : ");
 
-            var constraintStrings = EnumerateConstraintStrings(typeParameter).ToArray();
+            var constraintStrings = EnumerateConstraintStrings(typeParameter, cxt).ToArray();
             foreach ((var constraintString, var last) in constraintStrings.WithLastFlag())
             {
                 cxt.Writer.Write(constraintString);
@@ -1423,7 +1444,8 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
     }
 
     private static IEnumerable<string> EnumerateConstraintStrings(
-        ITypeParameterSymbol typeParameter)
+        ITypeParameterSymbol typeParameter,
+        TypeEmissionContext cxt)
     {
         if (typeParameter.HasReferenceTypeConstraint)
         {
@@ -1454,7 +1476,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
         foreach (var constraintType in typeParameter.ConstraintTypes)
         {
-            yield return constraintType.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString();
+            yield return constraintType.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt);
         }
 
         if (typeParameter.HasConstructorConstraint)
@@ -1493,9 +1515,11 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         EmitMainModifiers(
             property,
             cxt,
-            includeSealed: !property.IsVirtual && property.DeclaredAccessibility is not Accessibility.Private);
+            includeSealed: !property.IsVirtual
+                && property.DeclaredAccessibility is not Accessibility.Private);
         cxt.Writer.Write(" ");
-        cxt.Writer.Write(property.Type.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
+        cxt.Writer.Write(
+            property.Type.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
         cxt.Writer.Write(" ");
         cxt.Writer.Write(property.Name);
         cxt.Writer.WriteLine();
@@ -1581,7 +1605,8 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             cxt,
             includeSealed: !@event.IsVirtual && @event.DeclaredAccessibility is not Accessibility.Private);
         cxt.Writer.Write(" event ");
-        cxt.Writer.Write(@event.Type.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
+        cxt.Writer.Write(
+            @event.Type.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
         cxt.Writer.Write(" ");
         cxt.Writer.Write(@event.Name);
         cxt.Writer.WriteLine();
@@ -1674,7 +1699,8 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             {
                 cxt.Writer.Write("static ");
             }
-            cxt.Writer.Write(eventType.DelegateInvokeMethod.ReturnType.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
+            cxt.Writer.Write(
+                eventType.DelegateInvokeMethod.ReturnType.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
             cxt.Writer.Write(" ");
             cxt.Writer.Write(@event.Name);
             cxt.Writer.Write("_Invoke");
@@ -1761,7 +1787,8 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                 cxt.Writer.Write("<");
                 foreach ((var typeArgument, var last) in type.TypeArguments.WithLastFlag())
                 {
-                    cxt.Writer.Write(typeArgument.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
+                    cxt.Writer.Write(
+                        typeArgument.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
                     if (!last)
                     {
                         cxt.Writer.Write(", ");
@@ -1864,11 +1891,13 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             cxt.Writer.Write("public ");
         }
         cxt.Writer.Write("extern static ");
-        cxt.Writer.Write(property.Type.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
+        cxt.Writer.Write(
+            property.Type.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
         cxt.Writer.Write(" ");
         cxt.Writer.Write(property.GetMethod!.Name);
         cxt.Writer.Write("(");
-        cxt.Writer.Write(declaringType.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
+        cxt.Writer.Write(
+            declaringType.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
         cxt.Writer.Write(" c");
         if (property.IsIndexer)
         {
@@ -1919,7 +1948,8 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         cxt.Writer.Write("extern static void ");
         cxt.Writer.Write(property.SetMethod!.Name);
         cxt.Writer.Write("(");
-        cxt.Writer.Write(declaringType.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
+        cxt.Writer.Write(
+            declaringType.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
         cxt.Writer.Write(" c");
         if (property.IsIndexer)
         {
@@ -1931,7 +1961,8 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                 isForUnsafeAccessor: true);
         }
         cxt.Writer.Write(", ");
-        cxt.Writer.Write(property.Type.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
+        cxt.Writer.Write(
+            property.Type.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
         cxt.Writer.Write(" ");
         cxt.Writer.Write("v);");
         cxt.Writer.WriteLine();
@@ -2027,9 +2058,11 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         cxt.Writer.Write("extern static void ");
         cxt.Writer.Write(@event.AddMethod!.Name);
         cxt.Writer.Write("(");
-        cxt.Writer.Write(declaringType.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
+        cxt.Writer.Write(
+            declaringType.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
         cxt.Writer.Write(" c, ");
-        cxt.Writer.Write(@event.Type.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
+        cxt.Writer.Write(
+            @event.Type.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
         cxt.Writer.Write(" h);");
         cxt.Writer.WriteLine();
     }
@@ -2070,9 +2103,11 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         cxt.Writer.Write("extern static void ");
         cxt.Writer.Write(@event.RemoveMethod!.Name);
         cxt.Writer.Write("(");
-        cxt.Writer.Write(declaringType.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
+        cxt.Writer.Write(
+            declaringType.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
         cxt.Writer.Write(" c, ");
-        cxt.Writer.Write(@event.Type.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
+        cxt.Writer.Write(
+            @event.Type.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
         cxt.Writer.Write(" h);");
         cxt.Writer.WriteLine();
     }
@@ -2153,11 +2188,13 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             cxt.Writer.Write("private");
         }
         cxt.Writer.Write(" extern static ref ");
-        cxt.Writer.Write(field.Type.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
+        cxt.Writer.Write(
+            field.Type.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
         cxt.Writer.Write(" ");
         field.WriteUnsafeAccessorName(cxt.Writer);
         cxt.Writer.Write("(");
-        cxt.Writer.Write(declaringType.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
+        cxt.Writer.Write(
+            declaringType.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
         cxt.Writer.Write(" c);");
         cxt.Writer.WriteLine();
     }

@@ -171,7 +171,7 @@ public class NullableAwareType
     private static class NullableAwareTypeGetter<T>
     {
         public static readonly PropertyInfo PropertyProperty =
-            typeof(NullableAwareTypeGetter<T>).GetPropertyOrThrow(nameof(Property));
+            typeof(NullableAwareTypeGetter<T>).GetProperty(nameof(Property))!;
 
         public static T Property
         {

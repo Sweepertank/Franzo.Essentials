@@ -285,9 +285,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             {
                 foreach (var interfaceFeature in @interface.DeclaredFeatures)
                 {
-                    if (feature.RoslynSymbol.MemberCollidesWith(
-                        interfaceFeature.RoslynSymbol,
-                        cxt.Compilation)
+                    if (feature.RoslynSymbol.MemberCollidesWith(interfaceFeature.RoslynSymbol)
                         && !feature.RoslynSymbol.IsImplicitlyDeclared)
                     {
                         lock (interfaceFeature.TypesDeclaringShadowingFeaturesLock)

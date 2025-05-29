@@ -1,14 +1,13 @@
 using System.Reflection;
-using Franzo.Essentials.Reflection;
 
 namespace Franzo.Essentials.Serialization;
 
 public partial interface IReadOnlyCommonSerializable
 {
     public static readonly PropertyInfo ItemsProperty =
-        typeof(IReadOnlyCommonSerializable).GetPropertyOrThrow(
+        typeof(IReadOnlyCommonSerializable).GetProperty(
             nameof(_Items),
-            BindingFlags.Static | BindingFlags.NonPublic);
+            BindingFlags.Static | BindingFlags.NonPublic)!;
 
     private static object? _Items
     {

@@ -520,14 +520,14 @@ public static class TypeExtensions
         return self.GetPropertiesAndFields().Where(p => !p.IsStatic);
     }
 
-    public static MethodInfo GetMethodOrThrow(
+    /*public static MethodInfo GetMethodOrThrow(
         this Type self,
         string name,
         BindingFlags bindingFlags = NetStandardReflectionHelper.DefaultBindingFlags)
     {
         return self.GetMethod(name, bindingFlags)
             ?? throw new InvalidOperationException($"The specified method '{name}' could not be found on type '{self}'.");
-    }
+    }*/
 
     public static ConstructorInfo? GetDefaultConstructor(this Type self)
     {

@@ -36,19 +36,30 @@ internal static class NamedTypeSymbolExtensions
         return self.ToDisplayString().StartsWith("System.Runtime.CompilerServices");
     }
 
-    public static string MemberifiedName(this INamedTypeSymbol self)
+    public static string MemberifiedName(this INamedTypeSymbol self, TypeEmissionContext cxt)
     {
-        var str = self.Name.WithoutInterfaceI();
+        return MemberifiedNameCore(self);
+    }
+
+    internal static string MemberifiedNameCore(this INamedTypeSymbol self)
+    {
+        var sb = new StringBuilder();
+        if (self.ContainingType is not null)
+        {
+            sb.Append(self.ContainingType.ToMangledTypeQualifiedWithTypeParametersDisplayName());
+            sb.Append("_");
+        }
+
+        sb.Append(self.Name.WithoutInterfaceI());
 
         if (self.TypeArguments.Length > 0)
         {
-            var sb = new StringBuilder();
             sb.Append("__");
 
             foreach ((var typeArgument, var last) in self.TypeArguments.WithLastFlag())
             {
                 sb.Append(
-                    typeArgument.ToDisplayString(TypeQualifiedWithTypeParametersFormat).MangleSymbolName());
+                    typeArgument.ToMangledTypeQualifiedWithTypeParametersDisplayName());
 
                 if (!last)
                 {
@@ -57,17 +68,14 @@ internal static class NamedTypeSymbolExtensions
             }
 
             sb.Append("__");
-
-            str += sb.ToString();
         }
 
-        if (self.ContainingType is not null)
-        {
-            str = self.ContainingType.ToDisplayString(TypeQualifiedWithTypeParametersFormat).MangleSymbolName()
-                + "_"
-                + str;
-        }
+        return sb.ToString();
+    }
 
-        return str;
+    private static string ToMangledTypeQualifiedWithTypeParametersDisplayName(
+        this ISymbol self)
+    {
+        return self.ToDisplayString(TypeQualifiedWithTypeParametersFormat).MangleSymbolName();
     }
 }

@@ -1,10 +1,8 @@
-using System.Reflection;
-
 namespace Franzo.Essentials.Reflection;
 
 public static class TypeExtensions
 {
-    public static PropertyInfo GetPropertyOrThrow(
+    /*public static PropertyInfo GetPropertyOrThrow(
         this Type self,
         string propertyName,
         BindingFlags bindingFlags = NetStandardReflectionHelper.DefaultBindingFlags)
@@ -17,7 +15,7 @@ public static class TypeExtensions
         }
 
         return property;
-    }
+    }*/
 
     public static string UngenericizedName(this Type self)
     {
