@@ -11,8 +11,11 @@ internal class Context
     private readonly ConcurrentDictionary<ISymbol, string> _fullyQualifiedWithNullableReferenceTypeAnnotationsDisplayStrings =
         new(JohnLockeEnvironment.ProcessorCount, 2048, SymbolEqualityComparer.IncludeNullability);
 
-    //private readonly ConcurrentDictionary<INamedTypeSymbol, string> _memberifiedNames =
-    //    new(JohnLockeEnvironment.ProcessorCount, 1024, SymbolEqualityComparer.IncludeNullability);
+    private readonly ConcurrentDictionary<ITypeSymbol, string> _memberifiedNames =
+        new(JohnLockeEnvironment.ProcessorCount, 1024, SymbolEqualityComparer.IncludeNullability);
+
+    private readonly ConcurrentDictionary<ITypeSymbol, string> _mangledTypeQualifiedWithTypeParametersNames =
+        new(JohnLockeEnvironment.ProcessorCount, 1024, SymbolEqualityComparer.IncludeNullability);
 
     public readonly CSharpCompilation Compilation;
     public readonly ImmutableHashSet<INamedTypeSymbol> PossiblyRelevantTopLevelRoslynTypes;
@@ -37,10 +40,17 @@ internal class Context
             s => s.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString());
     }
 
-    /*public string GetMemberifiedName(INamedTypeSymbol roslynSymbol)
+    public string GetMemberifiedName(ITypeSymbol roslynSymbol)
     {
         return _memberifiedNames.GetOrAdd(
             roslynSymbol,
-            s => s.MemberifiedNameCore());
-    }*/
+            s => s.MemberifiedNameCore(this));
+    }
+
+    public string GetMangledTypeQualifiedWithTypeParametersName(ITypeSymbol roslynSymbol)
+    {
+        return _mangledTypeQualifiedWithTypeParametersNames.GetOrAdd(
+            roslynSymbol,
+            s => s.ToMangledTypeQualifiedWithTypeParametersNameCore());
+    }
 }
