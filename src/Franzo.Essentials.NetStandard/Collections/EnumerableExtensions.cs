@@ -4,6 +4,11 @@ namespace Franzo.Essentials.Collections;
 
 public static class EnumerableExtensions
 {
+    public static IEnumerable<T> WhereNotNull<T>(this IEnumerable<T?> self)
+    {
+        return self.Where(i => i is not null)!;
+    }
+
     public static IEnumerable<(T, bool)> WithFirstFlag<T>(this IEnumerable<T> self)
     {
         return new WithFirstFlagEnumerable<T>(self);
