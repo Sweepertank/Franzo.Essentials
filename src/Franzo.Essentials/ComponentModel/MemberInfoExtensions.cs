@@ -1,6 +1,5 @@
 using System.ComponentModel;
 using System.Reflection;
-using Franzo.Essentials;
 using Franzo.Essentials.Reflection;
 
 namespace Franzo.Essentials.ComponentModel;

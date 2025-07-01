@@ -1,6 +1,5 @@
 using System.ComponentModel;
 using System.Globalization;
-using Franzo.Essentials;
 
 namespace Franzo.Essentials.ComponentModel;
 
