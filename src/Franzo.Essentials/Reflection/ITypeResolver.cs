@@ -2,7 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Franzo.Essentials.Reflection;
 
-public partial interface ITypeResolver
+public interface ITypeResolver
 {
     public static readonly ITypeResolver Null = NullTypeResolver.Instance;
 

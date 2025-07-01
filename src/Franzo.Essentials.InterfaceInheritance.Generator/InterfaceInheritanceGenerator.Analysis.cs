@@ -109,20 +109,11 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
         if (type.RoslynSymbol.HasAttribute<DoNotGenerateInheritancesAttribute>())
         {
-            if (type.RoslynSymbol.Name == InterfaceDataClassName)
-            {
-                cxt.ReportDiagnostic(
-                    Diagnostic.Create(
-                        DiagnosticDescriptors.Dummy,
-                        type.RoslynSymbol.Locations.First()));
-            }
-            else
-            {
-                type.DoNotGenerateInheritances = true;
-            }
+            type.DoNotGenerateInheritances = true;
         }
 
-        if (type.RoslynSymbol.Name == InterfaceDataClassName)
+        if (type.RoslynSymbol.Name == InterfaceDataClassName
+            && type.ContainingType?.RoslynSymbol.TypeKind is TypeKind.Interface)
         {
             var invalid = false;
 
@@ -130,7 +121,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             {
                 cxt.ReportDiagnostic(
                     Diagnostic.Create(
-                        DiagnosticDescriptors.Dummy,
+                        DiagnosticDescriptors.InterfaceDataClassMustBeClass,
                         type.RoslynSymbol.Locations.First()));
                 invalid = true;
             }
@@ -141,7 +132,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             {
                 cxt.ReportDiagnostic(
                     Diagnostic.Create(
-                        DiagnosticDescriptors.Dummy,
+                        DiagnosticDescriptors.InterfaceDataClassCannotHaveTypeParameters,
                         type.RoslynSymbol.Locations.First()));
                 invalid = true;
             }
@@ -150,25 +141,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             {
                 cxt.ReportDiagnostic(
                     Diagnostic.Create(
-                        DiagnosticDescriptors.Dummy,
-                        type.RoslynSymbol.Locations.First()));
-                invalid = true;
-            }
-
-            if (type.ContainingType?.RoslynSymbol.TypeKind is not TypeKind.Interface)
-            {
-                cxt.ReportDiagnostic(
-                    Diagnostic.Create(
-                        DiagnosticDescriptors.Dummy,
-                        type.RoslynSymbol.Locations.First()));
-                invalid = true;
-            }
-
-            if (type.RoslynSymbol.Name != InterfaceDataClassName)
-            {
-                cxt.ReportDiagnostic(
-                    Diagnostic.Create(
-                        DiagnosticDescriptors.Dummy,
+                        DiagnosticDescriptors.InterfaceDataClassMustBePublic,
                         type.RoslynSymbol.Locations.First()));
                 invalid = true;
             }
@@ -180,24 +153,16 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
             var publicConstructors = type.DeclaredConstructors.Where(
                 m => m.RoslynSymbol.DeclaredAccessibility is Accessibility.Public);
-            if (publicConstructors.Count() > 1)
+            if (publicConstructors.Count() != 1)
             {
                 cxt.ReportDiagnostic(
                     Diagnostic.Create(
-                        DiagnosticDescriptors.Dummy,
+                        DiagnosticDescriptors.InterfaceDataClassMustDeclareExactlyOnePublicConstructor,
                         type.RoslynSymbol.Locations.First()));
                 invalid = true;
             }
 
             var publicConstructor = publicConstructors.FirstOrDefault();
-            if (publicConstructor is null)
-            {
-                cxt.ReportDiagnostic(
-                    Diagnostic.Create(
-                        DiagnosticDescriptors.Dummy,
-                        type.RoslynSymbol.Locations.First()));
-                invalid = true;
-            }
 
             if (!invalid)
             {
@@ -305,10 +270,19 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             if (type.DataClass is null
                 && type.ColonSpecifiedDirectInterfaces.Any(i => i.DataClass is not null))
             {
-                cxt.ReportDiagnostic(
-                    Diagnostic.Create(
-                        DiagnosticDescriptors.Dummy,
-                        type.RoslynSymbol.Locations.First()));
+                foreach (var @interface in type.ColonSpecifiedDirectInterfaces)
+                {
+                    if (@interface.DataClass is null)
+                    {
+                        continue;
+                    }
+
+                    cxt.ReportDiagnostic(
+                        Diagnostic.Create(
+                            DiagnosticDescriptors.NonDatafulInterfaceCannotImplementDatafulInterface,
+                            type.RoslynSymbol.Locations.First(),
+                            [type.RoslynSymbol, @interface.RoslynSymbol]));
+                }
             }
 
             foreach (var feature in type.DeclaredFeatures)
@@ -336,10 +310,10 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                     {
                         cxt.ReportDiagnostic(
                             Diagnostic.Create(
-                                DiagnosticDescriptors.Dummy,
-                                type.RoslynSymbol.Locations.First()));
+                                DiagnosticDescriptors.TypeMustDeclareConstructor,
+                                type.RoslynSymbol.Locations.First(),
+                                [type.RoslynSymbol, @interface.RoslynSymbol]));
                         enableEmitDefaultConstructor = true;
-                        break;
                     }
                 }
 
@@ -469,7 +443,8 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                     cxt.Data.TypesCreatedDuringTypeInitializationPhase2.Add(type);
                 }
                 break;
-        };
+        }
+        ;
 
         lock (cxt.Data.TypeCreationLock)
         {

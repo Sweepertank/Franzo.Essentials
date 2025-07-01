@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Franzo.Essentials.ComponentModel;
 
-public partial interface ITypeConverterResolver
+public interface ITypeConverterResolver
 {
     public static readonly ITypeConverterResolver Null = NullTypeConverterResolver.Instance;
 
