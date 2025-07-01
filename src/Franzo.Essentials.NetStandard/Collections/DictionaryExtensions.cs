@@ -2,14 +2,14 @@ namespace Franzo.Essentials.Collections;
 
 public static class DictionaryExtensions
 {
-    public static TValue GetValueOrDefault<TKey, TValue>(
+    public static TValue GetOrAdd<TKey, TValue>(
         this IDictionary<TKey, TValue> self,
         TKey key,
-        Func<TValue> defaultValueFactory) where TKey : notnull
+        Func<TValue> valueFactory) where TKey : notnull
     {
         if (!self.TryGetValue(key, out var value))
         {
-            value = defaultValueFactory.Invoke();
+            value = valueFactory.Invoke();
             self[key] = value;
         }
 
