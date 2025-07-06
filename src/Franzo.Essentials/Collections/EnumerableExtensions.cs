@@ -12,4 +12,11 @@ public static class EnumerableExtensions
 
         return self.SequenceEqual(other, equalityComparer);
     }
+
+    public static TTarget? FirstOrDefault<TSource, TTarget>(
+        this IEnumerable<TSource> self,
+        Predicate<TTarget>? predicate = null)
+    {
+        return self.OfType<TTarget>().FirstOrDefault(predicate ?? (_ => true));
+    }
 }
