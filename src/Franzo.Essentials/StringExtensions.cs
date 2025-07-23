@@ -155,7 +155,7 @@ public static class StringExtensions
         int zeroBasedColumn;
         if (self.Contains('\n'))
         {
-            (var beforeLastLineStr, var lastLine) = self.SliceAfterLast('\n');
+            (var beforeLastLineStr, var lastLine) = self.SliceAfterLast("\n");
             zeroBasedLine = beforeLastLineStr.Count(c => c is '\n');
             zeroBasedColumn = System.Math.Max(0, lastLine.Length - 1);
         }

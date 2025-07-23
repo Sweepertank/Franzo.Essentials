@@ -4,9 +4,9 @@ namespace Franzo.Essentials;
 
 public static class NetStandardStringExtensions
 {
-    public static string RemoveStartingAtFirst(this string self, char c)
+    public static string RemoveStartingAtFirst(this string self, string str)
     {
-        var index = self.IndexOf(c);
+        var index = self.IndexOf(str);
         if (index < 0)
         {
             return self;
@@ -15,9 +15,9 @@ public static class NetStandardStringExtensions
         return self.Remove(index);
     }
 
-    public static string RemoveStartingAtLast(this string self, char c)
+    public static string RemoveStartingAtLast(this string self, string str)
     {
-        var index = self.LastIndexOf(c);
+        var index = self.LastIndexOf(str);
         if (index < 0)
         {
             return self;
@@ -26,9 +26,9 @@ public static class NetStandardStringExtensions
         return self.Remove(index);
     }
 
-    public static string RemoveUpToAndIncludingLast(this string self, char c)
+    public static string RemoveUpToAndIncludingLast(this string self, string str)
     {
-        var index = self.LastIndexOf(c);
+        var index = self.LastIndexOf(str);
         if (index < 0)
         {
             return self;
@@ -37,9 +37,9 @@ public static class NetStandardStringExtensions
         return self.Remove(0, index + 1);
     }
 
-    public static string RemoveUpToAndIncludingFirst(this string self, char c)
+    public static string RemoveUpToAndIncludingFirst(this string self, string str)
     {
-        var index = self.IndexOf(c);
+        var index = self.IndexOf(str);
         if (index < 0)
         {
             return self;
@@ -77,14 +77,25 @@ public static class NetStandardStringExtensions
         };
     }
 
-    public static (string, string) SliceAfterLast(this string self, char character)
+    public static (string, string) SliceAfterLast(this string self, string str)
     {
-        int index = self.LastIndexOf(character);
+        int index = self.LastIndexOf(str);
         if (index < 0)
         {
             return (self, "");
         }
 
         return (self.Substring(0, index + 1), self.Substring(index + 1, self.Length - index - 1));
+    }
+
+    public static (string, string) SplitAfterLast(this string self, string str)
+    {
+        int index = self.LastIndexOf(str);
+        if (index < 0)
+        {
+            return (self, "");
+        }
+
+        return (self.Substring(0, index), self.Substring(index + 1, self.Length - index - 1));
     }
 }
