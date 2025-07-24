@@ -461,20 +461,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             cxt.Writer.WriteBracedSectionStart();
 
             cxt.Writer.Write("if (");
-            if (type.IsDataClass)
-            {
-                cxt.Writer.Write("((");
-                cxt.Writer.Write(
-                    @interface.RoslynSymbol.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
-                cxt.Writer.Write(")");
-                cxt.Writer.Write(nameof(InterfaceData.This));
-                cxt.Writer.Write(").");
-                cxt.Writer.Write(GeneratedInterfaceDataPropertyName);
-            }
-            else
-            {
-                EmitRealDataFieldName(@interface, cxt);
-            }
+            EmitInterfaceDataPropertyAccessExpression(@interface, type, cxt);
             cxt.Writer.Write(".");
             cxt.Writer.Write(nameof(InterfaceData.__IsConstructed));
             cxt.Writer.Write(") return null!;");
@@ -486,7 +473,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                 {
                     if (ancestorInterface.DataClass is null) continue;
 
-                    EmitRealDataFieldName(ancestorInterface, cxt);
+                    EmitInterfaceDataPropertyAccessExpression(ancestorInterface, type, cxt);
                     cxt.Writer.Write(".");
                     cxt.Writer.Write(nameof(InterfaceData.__This));
                     cxt.Writer.Write(" = this;");
@@ -504,20 +491,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             cxt.Writer.Write(".");
             cxt.Writer.Write(GeneratedConstructorAccessorName);
             cxt.Writer.Write("(");
-            if (type.IsDataClass)
-            {
-                cxt.Writer.Write("((");
-                cxt.Writer.Write(
-                    @interface.RoslynSymbol.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
-                cxt.Writer.Write(")");
-                cxt.Writer.Write(nameof(InterfaceData.This));
-                cxt.Writer.Write(").");
-                cxt.Writer.Write(GeneratedInterfaceDataPropertyName);
-            }
-            else
-            {
-                EmitRealDataFieldName(@interface, cxt);
-            }
+            EmitInterfaceDataPropertyAccessExpression(@interface, type, cxt);
             if (@interface.DataClass.ConstructorIfDataClass.RoslynSymbol.Parameters.Length > 0)
             {
                 cxt.Writer.Write(", ");
@@ -532,6 +506,20 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
             cxt.Writer.WriteBracedSectionEnd();
         }
+    }
+
+    private static void EmitInterfaceDataPropertyAccessExpression(
+        InternalTypeSymbol @interface,
+        InternalTypeSymbol withinType,
+        TypeEmissionContext cxt)
+    {
+        cxt.Writer.Write("((");
+        cxt.Writer.Write(
+            @interface.RoslynSymbol.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
+        cxt.Writer.Write(")");
+        cxt.Writer.Write(withinType.IsDataClass ? nameof(InterfaceData.This) : "this");
+        cxt.Writer.Write(").");
+        cxt.Writer.Write(GeneratedInterfaceDataPropertyName);
     }
 
     private static void EmitFakeDataFieldName(
