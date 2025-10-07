@@ -36,7 +36,7 @@ internal static class StringExtensions
 
     public static string WithoutInterfaceI(this string self)
     {
-        if (self.StartsWith("I") && self.Length > 1 && self[1].IsUpper() && self.Length != 2)
+        if (self.StartsWith("I") && self.Length > 1 && char.IsUpper(self[1]) && self.Length != 2)
         {
             return self.Substring(1);
         }
