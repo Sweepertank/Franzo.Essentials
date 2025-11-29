@@ -302,7 +302,13 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         {
             if (!type.HasExplicitlyDeclaredConstructor)
             {
-                var enableEmitDefaultConstructor = false;
+                var emitDefaultConstructor = true;
+
+                if (type.RoslynSymbol.IsStatic)
+                {
+                    emitDefaultConstructor = false;
+                }
+
                 foreach (var @interface in type.AnchorType.DirectInterfaces)
                 {
                     if (@interface.DataClass is not null
@@ -313,7 +319,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                                 DiagnosticDescriptors.TypeMustDeclareConstructor,
                                 type.RoslynSymbol.Locations.First(),
                                 [type.RoslynSymbol, @interface.RoslynSymbol]));
-                        enableEmitDefaultConstructor = true;
+                        emitDefaultConstructor = false;
                     }
                 }
 
@@ -323,14 +329,11 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                         c => c.RoslynSymbol.IsAccessibleWithin(type.RoslynSymbol, cxt.Compilation)
                             && c.RoslynSymbol.CanBeCalledWithZeroArgumentsInSource()))
                     {
-                        enableEmitDefaultConstructor = true;
+                        emitDefaultConstructor = false;
                     }
                 }
 
-                if (!enableEmitDefaultConstructor)
-                {
-                    type.EmitDefaultConstructor = true;
-                }
+                type.EmitDefaultConstructor = emitDefaultConstructor;
             }
         }
 
