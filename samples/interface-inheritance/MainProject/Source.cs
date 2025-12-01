@@ -110,6 +110,29 @@ public partial record class Cc : IBb
     }
 }
 
+public partial interface Yick1
+{
+    public object Bucky { get; }
+}
+
+public partial interface Yick2 : Yick1
+{
+    public new sealed EventArgs Bucky
+    {
+        get => (EventArgs)AsYick1().Bucky;
+    }
+}
+
+public partial class Yick3 : Yick2
+{
+    object Yick1.Bucky => EventArgs.Empty;
+
+    public Yick3()
+    {
+        var s = Bucky;
+    }
+}
+
 /*public partial interface IGeneric<T>
 {
     [InterfaceData]

@@ -11,10 +11,10 @@ internal static class SymbolExtensions
     //public static readonly object DuplicateSourceComparer;
     //public static readonly MethodInfo ComparerEqualsMethod;
     //public static readonly MethodInfo UnderlyingSymbolGetter;
-    private static readonly object DuplicateSourceComparerInstance;
-    private static readonly MethodInfo DuplicateSourceComparerEqualsMethod;
+    private static readonly MethodInfo MemberSignatureComparerEqualsMethod;
     private static readonly MethodInfo UnderlyingSymbolGetMethod;
     private static Func<ISymbol, ISymbol, bool> DuplicateSourceComparer;
+    private static Func<ISymbol, ISymbol, bool> CanImplicitlyImplementComparer;
 
     private static SymbolDisplayFormat FullyQualifiedWithoutGlobalNamespaceFormat =
         SymbolDisplayFormat.FullyQualifiedFormat
@@ -27,20 +27,26 @@ internal static class SymbolExtensions
         var memberSignatureComparerType = codeAnalysisCSharpAssembly.GetType(
             "Microsoft.CodeAnalysis.CSharp.Symbols.MemberSignatureComparer");
 
-        DuplicateSourceComparerInstance = memberSignatureComparerType
+        var duplicateSourceComparerInstance = memberSignatureComparerType
             .GetField("DuplicateSourceComparer")
             .GetValue(null);
+        var canImplicitlyImplementComparerInstance = memberSignatureComparerType
+            .GetField("CSharpImplicitImplementationComparer")
+            .GetValue(null);
 
-        DuplicateSourceComparerEqualsMethod = memberSignatureComparerType.GetMethod(
+        MemberSignatureComparerEqualsMethod = memberSignatureComparerType.GetMethod(
             "Equals",
-            new Type[] { cSharpSymbolType, cSharpSymbolType });
+            [cSharpSymbolType, cSharpSymbolType]);
 
         UnderlyingSymbolGetMethod = codeAnalysisCSharpAssembly
             .GetType("Microsoft.CodeAnalysis.CSharp.Symbols.PublicModel.Symbol")
             .GetProperty("UnderlyingSymbol", BindingFlags.NonPublic | BindingFlags.Instance)
             .GetMethod;
 
-        DuplicateSourceComparer = CreateDuplicateSourceComparer();
+        DuplicateSourceComparer =
+            CreateMemberSignatureComparer(duplicateSourceComparerInstance);
+        CanImplicitlyImplementComparer =
+            CreateMemberSignatureComparer(canImplicitlyImplementComparerInstance);
     }
 
     public static bool IsAccessibleWithin(
@@ -99,6 +105,13 @@ internal static class SymbolExtensions
         return DuplicateSourceComparer.Invoke(self, otherMember);
     }
 
+    public static bool MemberCanImplicitlyImplement(
+        this ISymbol self,
+        ISymbol otherMember)
+    {
+        return CanImplicitlyImplementComparer.Invoke(self, otherMember);
+    }
+
     public static bool IsGeneric(this ISymbol self)
     {
         return self.TypeParameters().Count() > 0;
@@ -140,22 +153,26 @@ internal static class SymbolExtensions
             self);
     }
 
-    private static Func<ISymbol, ISymbol, bool> CreateDuplicateSourceComparer()
+    private static Func<ISymbol, ISymbol, bool> CreateMemberSignatureComparer(
+        object comparerInstance)
     {
         var coreMethod = typeof(SymbolExtensions).GetMethod(
-            nameof(CreateDuplicateSourceComparerCore),
+            nameof(CreateMemberSignatureComparerCore),
             BindingFlags.Static | BindingFlags.NonPublic);
         var constructedCoreMethod = coreMethod.MakeGenericMethod(UnderlyingSymbolGetMethod.ReturnType);
-        return (Func<ISymbol, ISymbol, bool>)constructedCoreMethod.Invoke(null, []);
+        return (Func<ISymbol, ISymbol, bool>)constructedCoreMethod.Invoke(
+            null,
+            [comparerInstance]);
     }
 
-    private static Func<ISymbol, ISymbol, bool> CreateDuplicateSourceComparerCore<T>()
+    private static Func<ISymbol, ISymbol, bool> CreateMemberSignatureComparerCore<T>(
+        object comparerInstance)
     {
         var underlyingSymbolGetter = UnderlyingSymbolGetMethod.CreateFastGetter<T>();
         var duplicateSourceComparerEqualsMethodDelegate =
-            (Func<T, T, bool>)DuplicateSourceComparerEqualsMethod.CreateDelegate(
+            (Func<T, T, bool>)MemberSignatureComparerEqualsMethod.CreateDelegate(
                 typeof(Func<T, T, bool>),
-                DuplicateSourceComparerInstance);
+                comparerInstance);
 
         return (a, b) => duplicateSourceComparerEqualsMethodDelegate.Invoke(
             underlyingSymbolGetter.Invoke(a),

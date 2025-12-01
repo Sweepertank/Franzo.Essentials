@@ -270,13 +270,24 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                     // we should change this so that we *do* emit inheritances for public abstract properties and methods,
                     // but just mark them them as partial
                     // (ideally we would do so for events too, but it doesn't look like partial events are coming any time soon)
-                    // note: above comment is old and probably confusing
-                    var featureImpl = type.RoslynSymbol.FindImplementationForInterfaceMember(feature.RoslynSymbol);
+                    // note: above comment is old and probably confusing and has literally nothing to do with this logic
                     if (feature.RoslynSymbol.DeclaredAccessibility is Accessibility.Public
-                        && feature.RoslynSymbol.IsAbstract
-                        && type.DirectInterfaces.All(
-                            i => i.RoslynSymbol.FindImplementationForInterfaceMember(feature.RoslynSymbol) is null)
-                        && (featureImpl is null || !featureImpl.IsExplicitImplementationFor(feature.RoslynSymbol)))
+                        // this used to be necessary when this generator added interfaces
+                        // (because DirectInterfaces would include not only the interfaces written in source, but also the interfaces we added)
+                        //&& type.DirectInterfaces.All(
+                        //    i => i.RoslynSymbol.FindImplementationForInterfaceMember(feature.RoslynSymbol) is null)
+                        // and if f has no explicit implementation anywhere in the hierarchy of type
+                        && feature.SelfAndShadowedImplicitlyImplementablePublicAbstractFeatures.Any(
+                            f =>
+                            {
+                                if (!f.RoslynSymbol.IsAbstract)
+                                {
+                                    return false;
+                                }
+
+                                var fImpl = type.RoslynSymbol.FindImplementationForInterfaceMember(f.RoslynSymbol);
+                                return fImpl is null || !fImpl.IsExplicitImplementationFor(f.RoslynSymbol);
+                            }))
                     {
                         continue;
                     }

@@ -253,6 +253,16 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                     if (feature.RoslynSymbol.MemberCollidesWith(interfaceFeature.RoslynSymbol)
                         && !feature.RoslynSymbol.IsImplicitlyDeclared)
                     {
+                        // @todo: it would be even more "optimal" if we only add to this list
+                        // if the feature not only collides with, but can implicitly implement interfaceFeature
+                        // if this message is still here i forgot to remove it
+                        if (interfaceFeature.RoslynSymbol.IsAbstract
+                            && interfaceFeature.RoslynSymbol.DeclaredAccessibility is Accessibility.Public
+                            && feature.RoslynSymbol.MemberCanImplicitlyImplement(interfaceFeature.RoslynSymbol))
+                        {
+                            feature.ImplicitlyImplementableShadowedPublicAbstractFeatures.Add(interfaceFeature);
+                        }
+
                         lock (interfaceFeature.TypesDeclaringShadowingFeaturesLock)
                         {
                             interfaceFeature.TypesDeclaringShadowingFeatures.Add(type);
@@ -447,7 +457,6 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                 }
                 break;
         }
-        ;
 
         lock (cxt.Data.TypeCreationLock)
         {
