@@ -369,6 +369,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         {
             if (@interface.DataClass is null) continue;
 
+            EmitDebuggerBrowsableNeverAttribute(cxt);
             cxt.Writer.Write("private ");
             cxt.Writer.Write(
                 @interface.RoslynSymbol.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
@@ -398,6 +399,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         {
             if (@interface.DataClass is null) continue;
 
+            EmitDebuggerBrowsableNeverAttribute(cxt);
             cxt.Writer.Write(
                 @interface.RoslynSymbol.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
             cxt.Writer.Write(".");
@@ -416,6 +418,12 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             cxt.Writer.WriteLine();
             cxt.Writer.WriteBracedSectionEnd();
         }
+    }
+
+    private static void EmitDebuggerBrowsableNeverAttribute(TypeEmissionContext cxt)
+    {
+        cxt.Writer.Write("[global::System.Diagnostics.DebuggerBrowsable(global::System.Diagnostics.DebuggerBrowsableState.Never)]");
+        cxt.Writer.WriteLine();
     }
 
     private static void EmitAsInterfaceMethod(
@@ -442,6 +450,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         {
             if (@interface.DataClass is null) continue;
 
+            EmitDebuggerBrowsableNeverAttribute(cxt);
             cxt.Writer.Write("private ");
             cxt.Writer.Write(
                 @interface.RoslynSymbol.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
@@ -701,7 +710,8 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                 case TypedConstantKind.Type:
                     EmitTypeTypedConstant(typedConstant, cxt);
                     break;
-            };
+            }
+            ;
         }
     }
 
