@@ -711,7 +711,6 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                     EmitTypeTypedConstant(typedConstant, cxt);
                     break;
             }
-            ;
         }
     }
 
