@@ -15,7 +15,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Franzo.Essentials.NetStandard\Franzo.Essentials.NetStandard.csproj" />
     <ProjectReference Include="..\Franzo.Essentials.InterfaceInheritance.Generator\Franzo.Essentials.InterfaceInheritance.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\Franzo.Essentials.InterfaceInheritance.MSBuild\Franzo.Essentials.InterfaceInheritance.MSBuild.csproj" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\Franzo.Essentials.MSBuild\Franzo.Essentials.MSBuild.csproj" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
   <ItemGroup>

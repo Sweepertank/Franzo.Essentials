@@ -1,16 +1,16 @@
 <Project>
 
   <UsingTask
-      TaskName="Franzo.Essentials.InterfaceInheritance.MSBuild.DevirtualizationTask"
+      TaskName="Franzo.Essentials.MSBuild.WeaveTask"
       TaskFactory="TaskHostFactory"
-      AssemblyFile="$(DevirtualizationTaskAssemblyPath)" />
+      AssemblyFile="$(WeaveTaskAssemblyPath)" />
 
   <Target
-      Name="InterfaceInheritanceDevirtualization"
+      Name="FranzoEssentialsWeave"
       AfterTargets="AfterCompile"
       Condition="Exists(@(IntermediateAssembly)) And ($(DesignTimeBuild) != true Or $(BuildingForLiveUnitTesting) == true)">
     <!-- Inputs="@(IntermediateAssembly)" -->
-    <Franzo.Essentials.InterfaceInheritance.MSBuild.DevirtualizationTask AssemblyPath="@(IntermediateAssembly)" ReferencePath="@(ReferencePath)" />
+    <Franzo.Essentials.MSBuild.WeaveTask AssemblyPath="@(IntermediateAssembly)" ReferencePath="@(ReferencePath)" />
   </Target>
 
 </Project>

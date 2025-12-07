@@ -1,9 +1,10 @@
-﻿using Microsoft.Build.Framework;
+﻿using System.Diagnostics;
+using Microsoft.Build.Framework;
 using Mono.Cecil;
 
-namespace Franzo.Essentials.InterfaceInheritance.MSBuild;
+namespace Franzo.Essentials.MSBuild;
 
-public class DevirtualizationTask : Microsoft.Build.Utilities.Task
+public class WeaveTask : Microsoft.Build.Utilities.Task
 {
     [Required]
     public string AssemblyPath { get; set; } = "";
@@ -21,6 +22,9 @@ public class DevirtualizationTask : Microsoft.Build.Utilities.Task
             ReadSymbols = true,
             AssemblyResolver = assemblyResolver
         });
+        var debuggerBrowsableAttributeConstructor = module.ImportReference(
+            typeof(DebuggerBrowsableAttribute).GetConstructors().First());
+        var debuggerBrowsableStateType = module.ImportReference(typeof(DebuggerBrowsableState));
 
         foreach (var type in module.GetTypes())
         {
@@ -33,6 +37,15 @@ public class DevirtualizationTask : Microsoft.Build.Utilities.Task
                     {
                         DevirtualizeMethod(property.SetMethod);
                     }
+                }
+
+                if (property.GetMethod.IsExplicitInterfaceMethodImplementation()
+                    && !property.GetMethod.HasDebuggerBrowsableAttribute())
+                {
+                    var argument = new CustomAttributeArgument(debuggerBrowsableStateType, 0);
+                    var attribute = new CustomAttribute(debuggerBrowsableAttributeConstructor);
+                    attribute.ConstructorArguments.Add(argument);
+                    property.CustomAttributes.Add(attribute);
                 }
             }
 

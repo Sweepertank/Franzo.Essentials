@@ -1,6 +1,6 @@
 using Mono.Cecil;
 
-namespace Franzo.Essentials.InterfaceInheritance.MSBuild;
+namespace Franzo.Essentials.MSBuild;
 
 internal class AssemblyResolver : DefaultAssemblyResolver
 {
@@ -9,9 +9,9 @@ internal class AssemblyResolver : DefaultAssemblyResolver
     private readonly Dictionary<string, AssemblyDefinition> _loadedAssembliesByPath =
         new(StringComparer.InvariantCultureIgnoreCase);
 
-    public DevirtualizationTask Task { get; }
+    public WeaveTask Task { get; }
 
-    public AssemblyResolver(DevirtualizationTask task, string[] referencePaths)
+    public AssemblyResolver(WeaveTask task, string[] referencePaths)
     {
         Task = task;
 
@@ -26,6 +26,7 @@ internal class AssemblyResolver : DefaultAssemblyResolver
         AssemblyNameReference name,
         ReaderParameters parameters)
     {
+        // all of this resolution logic is unused except base.Resolve()
         if (!_assemblyPathsBySimpleAssemblyName.TryGetValue(name.Name, out var assemblyPath))
         {
             return base.Resolve(name, parameters);
