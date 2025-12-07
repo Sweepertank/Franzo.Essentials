@@ -1,5 +1,7 @@
 using System.Collections;
+using System.ComponentModel;
 using Franzo.Essentials;
+using Franzo.Essentials.ComponentModel;
 
 namespace MainProject;
 
@@ -110,13 +112,16 @@ public partial record class Cc : IBb
     }
 }
 
+[DefaultValue(true)]
 public partial interface Yick1
 {
+    [ItemAddedEvent("Soup")]
     public object Bucky { get; }
 }
 
 public partial interface Yick2 : Yick1
 {
+    [DefaultValue(true)]
     public new sealed EventArgs Bucky
     {
         get => (EventArgs)AsYick1().Bucky;

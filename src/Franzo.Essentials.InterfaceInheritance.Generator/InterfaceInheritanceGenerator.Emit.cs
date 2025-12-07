@@ -18,6 +18,10 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
         Parallel.ForEach(
             cxt.AnalysisData.RootTypesToEmit,
+            /*new ParallelOptions()
+            {
+                MaxDegreeOfParallelism = 1
+            },*/
             (type, state, _) =>
             {
                 if (cxt.SourceProductionContext.CancellationToken.IsCancellationRequested)
@@ -149,6 +153,20 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         InternalTypeSymbol type,
         TypeEmissionContext cxt)
     {
+        if (type.RoslynSymbol.TypeKind.IsClassOrStruct())
+        {
+            foreach (var @interface in type.Interfaces)
+            {
+                // @todo: only emit attributes that don't exclude Class from their attribute targets
+                EmitAttributes(
+                    @interface.RoslynSymbol,
+                    type.RoslynSymbol,
+                    cxt,
+                    separateLines: true,
+                    emittingOnType: true);
+            }
+        }
+
         OpenType(type, cxt);
         cxt.TypeStack.Push(type);
 
@@ -619,13 +637,23 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         ISymbol symbol,
         INamedTypeSymbol withinType,
         TypeEmissionContext cxt,
-        bool separateLines)
+        bool separateLines,
+        bool emittingOnType = false)
     {
+        if (emittingOnType)
+        {
+
+        }
         var attributes = symbol.GetAttributes();
         // Note: protected/private protected member types in a interface CAN currently be accessed by implementing classes
         foreach ((var attribute, var last) in attributes.WithLastFlag())
         {
             if (attribute.AttributeClass is null
+                || (emittingOnType
+                    && attribute.AttributeClass.ToDisplayString() is "System.Reflection.DefaultMemberAttribute"
+                    && withinType.SelfAndBaseTypes().Any(
+                        t => t.GetAttributes().Any(
+                            a => attribute.AttributeClass?.ToDisplayString() is "System.Reflection.DefaultMemberAttribute")))
                 || attribute.AttributeClass.IsCompilerGeneratedAttributeType()
                 || !attribute.AttributeClass.IsAccessibleFromType(
                     withinType,
@@ -656,6 +684,23 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                     cxt.Writer.Write(" ");
                 }
             }
+        }
+    }
+
+    private static void EmitMaskedFeatureAttributes(
+        InternalFeatureSymbol feature,
+        INamedTypeSymbol withinType,
+        TypeEmissionContext cxt,
+        bool separateLines)
+    {
+        foreach (var maskedFeature in feature.MaskedFeatures)
+        {
+            if (!maskedFeature.RoslynSymbol.IsAccessibleWithin(withinType, cxt.MainContext.Compilation))
+            {
+                continue;
+            }
+
+            EmitAttributes(maskedFeature.RoslynSymbol, withinType, cxt, separateLines);
         }
     }
 
@@ -836,7 +881,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         {
             if (!isForUnsafeAccessor)
             {
-                EmitAttributes(parameter, withinType, cxt, false);
+                EmitAttributes(parameter, withinType, cxt, separateLines: false);
             }
 
             var refKindModifier = parameter.RefKind.ToCSharpString();
@@ -912,7 +957,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         INamedTypeSymbol withinType,
         TypeEmissionContext cxt)
     {
-        EmitAttributes(feature.RoslynSymbol, withinType, cxt, true);
+        EmitMaskedFeatureAttributes(feature, withinType, cxt, true);
         if (feature is not InternalFieldSymbol
             && feature.RoslynSymbol.DeclaredAccessibility is Accessibility.Public
             && !feature.HasOverrideAttribute)
@@ -996,7 +1041,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
         if (property.RoslynSymbol.GetMethod is not null)
         {
-            EmitAttributes(property.RoslynSymbol.GetMethod, withinType, cxt, false);
+            EmitAttributes(property.RoslynSymbol.GetMethod, withinType, cxt, separateLines: false);
             cxt.Writer.Write("get");
             cxt.Writer.WriteLine();
 
@@ -1036,7 +1081,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         if (property.RoslynSymbol.SetMethod is not null
             && property.RoslynSymbol.SetMethod.DeclaredAccessibility is not Accessibility.Private)
         {
-            EmitAttributes(property.RoslynSymbol.SetMethod, withinType, cxt, false);
+            EmitAttributes(property.RoslynSymbol.SetMethod, withinType, cxt, separateLines: false);
             EmitAccessibilityModifiersForPropertyAccessor(
                 property.RoslynSymbol.SetMethod,
                 property.RoslynSymbol,
@@ -1220,7 +1265,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
         if (@event.RoslynSymbol.AddMethod is not null)
         {
-            EmitAttributes(@event.RoslynSymbol.AddMethod, withinType, cxt, false);
+            EmitAttributes(@event.RoslynSymbol.AddMethod, withinType, cxt, separateLines: false);
             cxt.Writer.Write("add");
             cxt.Writer.WriteLine();
 
@@ -1258,7 +1303,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
         if (@event.RoslynSymbol.RemoveMethod is not null)
         {
-            EmitAttributes(@event.RoslynSymbol.RemoveMethod, withinType, cxt, false);
+            EmitAttributes(@event.RoslynSymbol.RemoveMethod, withinType, cxt, separateLines: false);
             cxt.Writer.Write("remove");
             cxt.Writer.WriteLine();
 
@@ -1519,7 +1564,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         INamedTypeSymbol withinType,
         TypeEmissionContext cxt)
     {
-        EmitAttributes(property, withinType, cxt, true);
+        EmitAttributes(property, withinType, cxt, separateLines: true);
         EmitMainModifiers(
             property,
             cxt,
@@ -1536,7 +1581,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
         if (property.GetMethod is not null)
         {
-            EmitAttributes(property.GetMethod, withinType, cxt, false);
+            EmitAttributes(property.GetMethod, withinType, cxt, separateLines: false);
             cxt.Writer.Write("get");
             cxt.Writer.WriteLine();
 
@@ -1570,7 +1615,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
         if (property.SetMethod is not null)
         {
-            EmitAttributes(property.SetMethod, withinType, cxt, false);
+            EmitAttributes(property.SetMethod, withinType, cxt, separateLines: false);
             EmitAccessibilityModifiersForPropertyAccessor(property.SetMethod, property, cxt);
             cxt.Writer.Write("set");
             cxt.Writer.WriteLine();
@@ -1607,7 +1652,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         INamedTypeSymbol withinType,
         TypeEmissionContext cxt)
     {
-        EmitAttributes(@event, withinType, cxt, true);
+        EmitAttributes(@event, withinType, cxt, separateLines: true);
         EmitMainModifiers(
             @event,
             cxt,
@@ -1623,7 +1668,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
         if (@event.AddMethod is not null)
         {
-            EmitAttributes(@event.AddMethod, withinType, cxt, false);
+            EmitAttributes(@event.AddMethod, withinType, cxt, separateLines: false);
             cxt.Writer.Write("add");
             cxt.Writer.WriteLine();
 
@@ -1653,7 +1698,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
 
         if (@event.RemoveMethod is not null)
         {
-            EmitAttributes(@event.RemoveMethod, withinType, cxt, false);
+            EmitAttributes(@event.RemoveMethod, withinType, cxt, separateLines: false);
             cxt.Writer.Write("remove");
             cxt.Writer.WriteLine();
 

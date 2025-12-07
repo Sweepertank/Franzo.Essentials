@@ -6,8 +6,14 @@ internal abstract class InternalFeatureSymbol : InternalMemberSymbol
 {
     public List<InternalTypeSymbol> TypesDeclaringShadowingFeatures = new();
     public readonly object TypesDeclaringShadowingFeaturesLock = new();
+    public readonly List<InternalFeatureSymbol> ShadowedFeatures = new();
     public bool HasOverrideAttribute = false;
     public List<InternalFeatureSymbol> ImplicitlyImplementableShadowedPublicAbstractFeatures = new();
+
+    public IEnumerable<InternalFeatureSymbol> MaskedFeatures
+    {
+        get => new[] { this }.Concat(ShadowedFeatures);
+    }
 
     public IEnumerable<InternalFeatureSymbol> SelfAndShadowedImplicitlyImplementablePublicAbstractFeatures
     {

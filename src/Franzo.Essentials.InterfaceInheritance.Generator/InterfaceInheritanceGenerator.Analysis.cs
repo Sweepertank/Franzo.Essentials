@@ -263,6 +263,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                             feature.ImplicitlyImplementableShadowedPublicAbstractFeatures.Add(interfaceFeature);
                         }
 
+                        feature.ShadowedFeatures.Add(interfaceFeature);
                         lock (interfaceFeature.TypesDeclaringShadowingFeaturesLock)
                         {
                             interfaceFeature.TypesDeclaringShadowingFeatures.Add(type);
