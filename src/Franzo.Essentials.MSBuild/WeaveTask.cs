@@ -28,6 +28,17 @@ public class WeaveTask : Microsoft.Build.Utilities.Task
 
         foreach (var type in module.GetTypes())
         {
+            foreach (var field in type.Fields)
+            {
+                if (field.IsPossiblyJrifConstructTyped())
+                {
+                    MakeDebuggerUnbrowsable(
+                        field,
+                        debuggerBrowsableAttributeConstructor,
+                        debuggerBrowsableStateType);
+                }
+            }
+
             foreach (var property in type.Properties)
             {
                 if (property.HasInterfaceInheritanceDevirtualizeAttribute())
@@ -39,13 +50,14 @@ public class WeaveTask : Microsoft.Build.Utilities.Task
                     }
                 }
 
-                if (property.GetMethod.IsExplicitInterfaceMethodImplementation()
-                    && !property.GetMethod.HasDebuggerBrowsableAttribute())
+                if ((property.GetMethod.IsExplicitInterfaceMethodImplementation()
+                     && !property.GetMethod.HasDebuggerBrowsableAttribute())
+                    || property.IsPossiblyJrifConstructTyped())
                 {
-                    var argument = new CustomAttributeArgument(debuggerBrowsableStateType, 0);
-                    var attribute = new CustomAttribute(debuggerBrowsableAttributeConstructor);
-                    attribute.ConstructorArguments.Add(argument);
-                    property.CustomAttributes.Add(attribute);
+                    MakeDebuggerUnbrowsable(
+                        property,
+                        debuggerBrowsableAttributeConstructor,
+                        debuggerBrowsableStateType);
                 }
             }
 
@@ -75,7 +87,18 @@ public class WeaveTask : Microsoft.Build.Utilities.Task
         return true;
     }
 
-    private void DevirtualizeMethod(MethodDefinition method)
+    private static void MakeDebuggerUnbrowsable(
+        IMemberDefinition member,
+        MethodReference attributeConstructor,
+        TypeReference stateType)
+    {
+        var argument = new CustomAttributeArgument(stateType, 0);
+        var attribute = new CustomAttribute(attributeConstructor);
+        attribute.ConstructorArguments.Add(argument);
+        member.CustomAttributes.Add(attribute);
+    }
+
+    private static void DevirtualizeMethod(MethodDefinition method)
     {
         method.Attributes &= ~(MethodAttributes.Final | MethodAttributes.NewSlot | MethodAttributes.Virtual);
     }
