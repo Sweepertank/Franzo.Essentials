@@ -28,7 +28,7 @@ public class WeaveTask : Microsoft.Build.Utilities.Task
 
         foreach (var type in module.GetTypes())
         {
-            foreach (var field in type.Fields)
+            /*foreach (var field in type.Fields)
             {
                 if (field.IsPossiblyJrifConstructTyped())
                 {
@@ -37,7 +37,7 @@ public class WeaveTask : Microsoft.Build.Utilities.Task
                         debuggerBrowsableAttributeConstructor,
                         debuggerBrowsableStateType);
                 }
-            }
+            }*/
 
             foreach (var property in type.Properties)
             {
@@ -50,9 +50,9 @@ public class WeaveTask : Microsoft.Build.Utilities.Task
                     }
                 }
 
-                if ((property.GetMethod.IsExplicitInterfaceMethodImplementation()
-                     && !property.GetMethod.HasDebuggerBrowsableAttribute())
-                    || property.IsPossiblyJrifConstructTyped())
+                if (property.GetMethod.IsExplicitInterfaceMethodImplementation()
+                     && !property.GetMethod.HasDebuggerBrowsableAttribute()
+                    /*|| property.IsPossiblyJrifConstructTyped()*/)
                 {
                     MakeDebuggerUnbrowsable(
                         property,
