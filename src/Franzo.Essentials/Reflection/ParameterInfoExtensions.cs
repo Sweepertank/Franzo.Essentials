@@ -30,11 +30,6 @@ public static class ParameterInfoExtensions
         return self.ParameterType.ToNullableAware(self.NullabilityInfo());
     }
 
-    /*public static object? DefaultValueOrNullableAwareParameterTypeDefaultValue(this ParameterInfo self)
-    {
-        return self.HasDefaultValue ? self.DefaultValue : self.NullableAwareParameterType().CreateDefaultValue();
-    }*/
-
     public static bool TypeIsEnumerableInterfaceOfHopefullyReadOnlyCollectionType(
         this ParameterInfo self,
         Type type)

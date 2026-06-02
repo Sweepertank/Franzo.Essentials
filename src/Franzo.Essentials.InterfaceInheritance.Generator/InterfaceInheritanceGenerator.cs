@@ -1,5 +1,4 @@
 using System.Collections.Immutable;
-using System.Diagnostics;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -13,28 +12,19 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
     internal const string GeneratedInterfaceDataPropertyName = "__Data_Prop";
     internal const string GeneratedConstructorAccessorName = "__Construct";
     internal const string DataString = "Data";
-    //internal const string UnderscoreClassSuffix = "_Class";
 
     public void Initialize(IncrementalGeneratorInitializationContext cxt)
     {
+        // @todo: use cxt.SyntaxProvider.ForAttributeWithMetadataName
         var types = cxt.SyntaxProvider
-            .CreateSyntaxProvider<INamedTypeSymbol?>(
+            .CreateSyntaxProvider(
                 (node, _) => IsNodePossiblyRelevant(node),
                 (cxt, _) => GetNodeBoundTypeIfTopLevel(cxt))
             .Where(t => t is not null);
 
-        // @todo: use cxt.SyntaxProvider.ForAttributeWithMetadataName
-
         cxt.RegisterSourceOutput(
             cxt.CompilationProvider.Combine(types.Collect()),
             Execute!);
-    }
-
-    private static void SuppressVirtualCallsPostfix(object __instance, ref bool __result)
-    {
-        //var syntax = _syntaxGetter.Invoke(__instance);
-        Console.WriteLine("HOY");
-        //Console.WriteLine(syntax.ToFullString());
     }
 
     private static bool IsNodePossiblyRelevant(SyntaxNode node)

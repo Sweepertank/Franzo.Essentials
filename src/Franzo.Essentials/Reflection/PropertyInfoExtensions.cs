@@ -76,18 +76,4 @@ public static class PropertyInfoExtensions
     {
         return self.SetMethod.ExistsAndIsPublic();
     }
-
-    /*[Obsolete]
-    public static bool IsHiddenByPropertyOn(this PropertyInfo self, Type type)
-    {
-        if (self.DeclaringType is null
-            || self.DeclaringType.IsInterface
-            || !type.IsAssignableTo(self.DeclaringType))
-        {
-            return false;
-        }
-
-        var propertyOfSameName = type.GetProperty(self.Name);
-        return !propertyOfSameName.MemberEquals(self);
-    }*/
 }

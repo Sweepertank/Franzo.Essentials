@@ -120,25 +120,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         {
             cxt.Writer.Write(" : ");
             cxt.Writer.Write(typeof(InterfaceData).GloballyQualifiedName());
-            //cxt.Writer.Write("<");
-            //cxt.Writer.Write(type.ContainingType!.RoslynSymbol.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
-            //cxt.Writer.Write(">");
         }
-        /*else if (type.RoslynSymbol.TypeKind.IsClassOrStruct())
-        {
-            if (type.AttributeSpecifiedDirectInterfaces.Count > 0)
-            {
-                cxt.Writer.Write(" : ");
-                foreach ((var i, var @interface) in type.AttributeSpecifiedDirectInterfaces.IndicesAndItems())
-                {
-                    cxt.Writer.Write(@interface.RoslynSymbol.ToFullyQualifiedDisplayString());
-                    if (i != type.AttributeSpecifiedDirectInterfaces.Count - 1)
-                    {
-                        cxt.Writer.Write(", ");
-                    }
-                }
-            }
-        }*/
 
         cxt.Writer.WriteLine();
         cxt.Writer.WriteBracedSectionStart();
@@ -284,17 +266,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                         continue;
                     }
 
-                    // @todo: once partial properties are in,
-                    // we should change this so that we *do* emit inheritances for public abstract properties and methods,
-                    // but just mark them them as partial
-                    // (ideally we would do so for events too, but it doesn't look like partial events are coming any time soon)
-                    // note: above comment is old and probably confusing and has literally nothing to do with this logic
                     if (feature.RoslynSymbol.DeclaredAccessibility is Accessibility.Public
-                        // this used to be necessary when this generator added interfaces
-                        // (because DirectInterfaces would include not only the interfaces written in source, but also the interfaces we added)
-                        //&& type.DirectInterfaces.All(
-                        //    i => i.RoslynSymbol.FindImplementationForInterfaceMember(feature.RoslynSymbol) is null)
-                        // and if f has no explicit implementation anywhere in the hierarchy of type
                         && feature.SelfAndShadowedImplicitlyImplementablePublicAbstractFeatures.Any(
                             f =>
                             {
@@ -519,9 +491,6 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                 }
             }
 
-            // @todo: remove string interpolations if needed for perf
-
-            // @todo: create delegate and invoke that instead
             cxt.Writer.Write(
                 @interface.RoslynSymbol.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
             cxt.Writer.Write(".");
@@ -640,10 +609,6 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         bool separateLines,
         bool emittingOnType = false)
     {
-        if (emittingOnType)
-        {
-
-        }
         var attributes = symbol.GetAttributes();
         // Note: protected/private protected member types in a interface CAN currently be accessed by implementing classes
         foreach ((var attribute, var last) in attributes.WithLastFlag())
@@ -1384,7 +1349,6 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             }
 
             cxt.Writer.Write(method.RoslynSymbol.Name);
-            //method.RoslynSymbol.WriteUnsafeAccessorName(writer);
             EmitTypeParameterList(method.RoslynSymbol.TypeParameters, cxt);
             cxt.Writer.Write("(");
             if (method.RoslynSymbol.IsStatic)
@@ -1435,14 +1399,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         cxt.Writer.Write(
             method.ReturnType.ToFullyQualifiedWithNullableReferenceTypeAnnotationsDisplayString(cxt));
         cxt.Writer.Write(" ");
-        /*if (isForUnsafeAccessor)
-        {
-            method.WriteUnsafeAccessorName(writer);
-        }
-        else
-        {*/
         cxt.Writer.Write(method.Name);
-        //}
         EmitTypeParameterList(method.TypeParameters, cxt);
         cxt.Writer.Write("(");
         if (isForUnsafeAccessor)
@@ -1473,8 +1430,6 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             if (!typeParameter.HasConstraints()) continue;
 
             cxt.Writer.WriteLine();
-
-            // @todo: EnumerableExtensions.WithLastFlag
 
             cxt.Writer.Indent++;
 

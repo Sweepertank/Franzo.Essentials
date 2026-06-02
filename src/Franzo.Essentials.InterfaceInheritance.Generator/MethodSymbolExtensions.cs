@@ -8,14 +8,4 @@ internal static class MethodSymbolExtensions
     {
         return self.Parameters.All(p => p.HasExplicitDefaultValue);
     }
-    /*public static bool AccessorIsInheritable(
-        this IMethodSymbol self)
-    {
-    }*/
-
-    /*public static void WriteUnsafeAccessorName(this IMethodSymbol self, TextWriter writer)
-    {
-        writer.Write("access_");
-        writer.Write(self.Name);
-    }*/
 }

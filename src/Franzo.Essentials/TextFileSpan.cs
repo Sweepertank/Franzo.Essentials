@@ -9,18 +9,9 @@ public readonly record struct TextFileSpan : IComparable<TextFileSpan>
         TextFilePosition.Start,
         0);
 
-    //public static readonly TextFileSpan Sentinel = new(
-    //    TextFilePosition.Sentinel,
-    //    TextFilePosition.Sentinel);
-
     public TextFilePosition Start { get; }
     public TextFilePosition End { get; }
     public int Width { get; }
-
-    //public bool IsSentinel
-    //{
-    //    get => Start.IsSentinel || End.IsSentinel;
-    //}
 
     public TextFileSpan(
         TextFilePosition start,
@@ -85,17 +76,6 @@ public readonly record struct TextFileSpan : IComparable<TextFileSpan>
 
         Debug.Assert(a is not null);
         Debug.Assert(b is not null);
-
-        /*if (a.File is null && b.File is not null) return -1;
-        if (a.File is not null && b.File is null) return 1;
-        if (a.File is not null && b.File is not null)
-        {
-            var fileNameStringComparison = a.File.Name.CompareTo(b.File.Name);
-            if (fileNameStringComparison != 0)
-            {
-                return fileNameStringComparison;
-            }
-        }*/
 
         var startPositionComparison = a.Value.Start.CompareTo(b.Value.Start);
         if (startPositionComparison != 0)

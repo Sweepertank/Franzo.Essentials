@@ -31,7 +31,6 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                     state.Stop();
                 }
 
-                //var x = roslynType.IsConstructedGenericType();
                 var type = CreateTypeIfEmitting(roslynType, null, cxt);
                 if (type is null) return;
 
@@ -100,11 +99,6 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         InternalTypeSymbol type,
         InternalAnalysisContext cxt)
     {
-        //if (type.HasPhase2Initialized)
-        //{
-        //    return;
-        //}
-
         InitializeTypeBaseTypesAndColonSpecifiedInterfaces(type, cxt);
 
         if (type.RoslynSymbol.HasAttribute<DoNotGenerateInheritancesAttribute>())
@@ -171,19 +165,12 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                 type.ContainingType!.DataClass = type;
             }
         }
-
-        //type.HasPhase2Initialized = true;
     }
 
     private static void InitializeTypeBaseTypesAndColonSpecifiedInterfaces(
         InternalTypeSymbol type,
         InternalAnalysisContext cxt)
     {
-        /*if (type.HasInitializedBaseTypesAndInterfaces)
-        {
-            return;
-        }*/
-
         if (type.RoslynSymbol.BaseType is not null)
         {
             type.BaseType = GetOrCreateType(
@@ -193,13 +180,6 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                 cxt);
         }
 
-        // This check is just an optimization -
-        // it prevents us from loading in interfaces that we don't care about
-        // (i.e. interfaces whose only connection to types that we *do* care about
-        // is the fact that they're colon-specified by a class that we care about)
-        // note: the above message is wrong and outdated
-        //if (type.RoslynSymbol.TypeKind is TypeKind.Interface)
-        //{
         foreach (var roslynInterface in type.RoslynSymbol.Interfaces)
         {
             var @interface = GetOrCreateType(
@@ -209,9 +189,6 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                 cxt);
             type.ColonSpecifiedDirectInterfaces.Add(@interface);
         }
-        //}
-
-        //type.HasInitializedBaseTypesAndInterfaces = true;
     }
 
     private static void AnalyzeTypes_Phase1(InternalAnalysisContext cxt)
@@ -239,11 +216,6 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
         InternalTypeSymbol type,
         InternalAnalysisContext cxt)
     {
-        /*if (type.HasPhase1Analyzed)
-        {
-            return;
-        }*/
-
         foreach (var feature in type.DeclaredFeatures)
         {
             foreach (var @interface in type.Interfaces)
@@ -253,9 +225,6 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                     if (feature.RoslynSymbol.MemberCollidesWith(interfaceFeature.RoslynSymbol)
                         && !feature.RoslynSymbol.IsImplicitlyDeclared)
                     {
-                        // @todo: it would be even more "optimal" if we only add to this list
-                        // if the feature not only collides with, but can implicitly implement interfaceFeature
-                        // if this message is still here i forgot to remove it
                         if (interfaceFeature.RoslynSymbol.IsAbstract
                             && interfaceFeature.RoslynSymbol.DeclaredAccessibility is Accessibility.Public
                             && feature.RoslynSymbol.MemberCanImplicitlyImplement(interfaceFeature.RoslynSymbol))
@@ -273,10 +242,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             }
         }
 
-        if (type.RoslynSymbol.TypeKind.IsClassOrStruct())
-        {
-        }
-        else
+        if (type.RoslynSymbol.TypeKind == TypeKind.Interface)
         {
             if (type.DataClass is null
                 && type.ColonSpecifiedDirectInterfaces.Any(i => i.DataClass is not null))
@@ -300,8 +266,7 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
             {
                 if (feature.RoslynSymbol.HasOverrideAttribute())
                 {
-                    // @todo: check if the feature is sealed or not, and if it isn't,
-                    // report an error
+                    // @todo: check if the feature is sealed or not, and if it isn't, report an error
                     // but there's no consistent way to check this (interface members outside of compiling assembly
                     // always have IsVirtual = false, even if they have the 'sealed' keyword)
                     feature.HasOverrideAttribute = true;
@@ -347,18 +312,6 @@ public partial class InterfaceInheritanceGenerator : IIncrementalGenerator
                 type.EmitDefaultConstructor = emitDefaultConstructor;
             }
         }
-
-        /*if (type.BaseType is not null)
-        {
-            AnalyzeType_Phase1(type.BaseType, cxt);
-        }
-
-        foreach (var @interface in type.DirectInterfaces)
-        {
-            AnalyzeType_Phase1(@interface, cxt);
-        }*/
-
-        //type.HasPhase1Analyzed = true;
     }
 
     private static InternalTypeSymbol GetOrCreateType(

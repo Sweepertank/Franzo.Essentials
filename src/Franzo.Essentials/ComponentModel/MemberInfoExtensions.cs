@@ -6,19 +6,6 @@ namespace Franzo.Essentials.ComponentModel;
 
 public static class MemberInfoExtensions
 {
-    /*public static object? ComponentModelDefaultValue(this MemberInfo self)
-    {
-        return self.HasComponentModelSpecifiedDefaultValue()
-               ? self.ComponentModelExplicitDefaultValue()
-               : self.NullableAwareReturnType().CreateDefaultValue();
-    }*/
-
-    /*public static bool HasComponentModelSpecifiedDefaultValue(this MemberInfo self)
-    {
-        return self.HasCustomAttributeSearchingBaseInterfacesIfInterface<DefaultValueAttribute>()
-            || self.HasCustomAttributeSearchingBaseInterfacesIfInterface<DefaultValueFieldAttribute>();
-    }*/
-
     public static object? ComponentModelExplicitDefaultValue(this MemberInfo self)
     {
         var defaultValueAttribute =

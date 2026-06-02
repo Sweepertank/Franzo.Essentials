@@ -38,11 +38,6 @@ public partial interface IPropertyChangedNotifier : INotifyPropertyChanged
         FirePropertyChanged(propertyName);
     }
 
-    /*public sealed void SetPropertyThrowingIfNull<T>(ref T field, T value, [CallerMemberName] string propertyName = "")
-    {
-        SetProperty(ref field, value, propertyName);
-    }*/
-
     protected void OnPropertyChanged(string? propertyName) { }
 
     public partial class Data_

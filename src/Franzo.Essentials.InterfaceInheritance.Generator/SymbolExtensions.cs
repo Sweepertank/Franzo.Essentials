@@ -8,9 +8,6 @@ namespace Franzo.Essentials.InterfaceInheritance.Generator;
 
 internal static class SymbolExtensions
 {
-    //public static readonly object DuplicateSourceComparer;
-    //public static readonly MethodInfo ComparerEqualsMethod;
-    //public static readonly MethodInfo UnderlyingSymbolGetter;
     private static readonly MethodInfo MemberSignatureComparerEqualsMethod;
     private static readonly MethodInfo UnderlyingSymbolGetMethod;
     private static Func<ISymbol, ISymbol, bool> DuplicateSourceComparer;
@@ -178,9 +175,4 @@ internal static class SymbolExtensions
             underlyingSymbolGetter.Invoke(a),
             underlyingSymbolGetter.Invoke(b));
     }
-
-    /*private static object UnderlyingSymbol(this ISymbol self)
-    {
-        return UnderlyingSymbolGetter.Invoke(self, null);
-    }*/
 }
