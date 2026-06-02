@@ -21,12 +21,6 @@ public static class NumberExtensions
 
     public static T SnappedToNearestMultipleOf<T>(this T self, T value) where T : INumber<T>
     {
-        // @Cleanup: is this necessary?
-        if (T.IsNaN(self))
-        {
-            return self;
-        }
-
         var low = (self / value) - (self % value) * value;
         var high = low + T.CopySign(T.One, self) * value;
 
